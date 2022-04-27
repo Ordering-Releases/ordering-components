@@ -699,6 +699,12 @@ Object.defineProperty(exports, "UserFormDetails", {
     return _UserFormDetails.UserFormDetails;
   }
 });
+Object.defineProperty(exports, "UserVerification", {
+  enumerable: true,
+  get: function get() {
+    return _UserVerification.UserVerification;
+  }
+});
 Object.defineProperty(exports, "UtilsContext", {
   enumerable: true,
   get: function get() {
@@ -1031,6 +1037,8 @@ var _ReviewCustomer = require("./components/ReviewCustomer");
 var _ReviewProduct = require("./components/ReviewProduct");
 
 var _ReviewDriver = require("./components/ReviewDriver");
+
+var _UserVerification = require("./components/UserVerification");
 
 var _WalletList = require("./components/WalletList");
 

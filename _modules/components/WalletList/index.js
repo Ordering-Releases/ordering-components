@@ -46,7 +46,9 @@ function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Sy
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 var WalletList = function WalletList(props) {
-  var UIComponent = props.UIComponent;
+  var UIComponent = props.UIComponent,
+      isWalletCashEnabled = props.isWalletCashEnabled,
+      isWalletPointsEnabled = props.isWalletPointsEnabled;
 
   var _useApi = (0, _ApiContext.useApi)(),
       _useApi2 = _slicedToArray(_useApi, 1),
@@ -62,8 +64,6 @@ var WalletList = function WalletList(props) {
       _useState2 = _slicedToArray(_useState, 2),
       walletSelected = _useState2[0],
       setWalletSelected = _useState2[1];
-
-  var requestsState = {};
 
   var _useState3 = (0, _react.useState)({
     wallets: [],
@@ -124,9 +124,9 @@ var WalletList = function WalletList(props) {
               error = _yield$response$json.error;
               result = _yield$response$json.result;
               setTransactions(_objectSpread(_objectSpread({}, transactions), {}, {
-                loading: false,
                 error: error ? result : null,
-                list: _objectSpread(_objectSpread({}, transactions.list), {}, _defineProperty({}, "wallet:".concat(walletId), error ? null : result))
+                list: _objectSpread(_objectSpread({}, transactions.list), {}, _defineProperty({}, "wallet:".concat(walletId), error ? null : result)),
+                loading: false
               }));
               _context.next = 18;
               break;
@@ -157,7 +157,7 @@ var WalletList = function WalletList(props) {
 
   var getWallets = /*#__PURE__*/function () {
     var _ref2 = _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee2() {
-      var response, _yield$response$json2, error, result;
+      var response, _yield$response$json2, error, result, cashWallet, pointsWallet;
 
       return _regenerator.default.wrap(function _callee2$(_context2) {
         while (1) {
@@ -184,7 +184,18 @@ var WalletList = function WalletList(props) {
               result = _yield$response$json2.result;
 
               if (!error && (result === null || result === void 0 ? void 0 : result.length) > 0) {
-                getTransactions(result[0].id);
+                cashWallet = isWalletCashEnabled ? result.find(function (wallet) {
+                  return wallet.type === 'cash';
+                }) : null;
+                pointsWallet = isWalletPointsEnabled ? result.find(function (wallet) {
+                  return wallet.type === 'credit_point';
+                }) : null;
+
+                if (cashWallet) {
+                  getTransactions(cashWallet.id);
+                } else if (pointsWallet) {
+                  getTransactions(pointsWallet.id);
+                }
               }
 
               setState(_objectSpread(_objectSpread({}, state), {}, {
@@ -220,11 +231,7 @@ var WalletList = function WalletList(props) {
   }();
 
   (0, _react.useEffect)(function () {
-    getWallets(); // return () => {
-    //   if (requestsState.wallets) {
-    //     requestsState.wallets.cancel()
-    //   }
-    // }
+    getWallets();
   }, []);
   (0, _react.useEffect)(function () {
     if (walletSelected) {
