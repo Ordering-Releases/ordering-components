@@ -27,6 +27,12 @@ Object.defineProperty(exports, "Analytics", {
     return _Analitycs.Analytics;
   }
 });
+Object.defineProperty(exports, "AnalyticsSegment", {
+  enumerable: true,
+  get: function get() {
+    return _AnalyticsSegment.AnalyticsSegment;
+  }
+});
 Object.defineProperty(exports, "ApiContext", {
   enumerable: true,
   get: function get() {
@@ -513,6 +519,12 @@ Object.defineProperty(exports, "PhoneAutocomplete", {
     return _PhoneAutocomplete.PhoneAutocomplete;
   }
 });
+Object.defineProperty(exports, "PlaceSpot", {
+  enumerable: true,
+  get: function get() {
+    return _PlaceSpot.PlaceSpot;
+  }
+});
 Object.defineProperty(exports, "Popup", {
   enumerable: true,
   get: function get() {
@@ -832,6 +844,8 @@ var _AddressForm = require("./components/AddressForm");
 
 var _AddressList = require("./components/AddressList");
 
+var _AnalyticsSegment = require("./components/AnalyticsSegment");
+
 var _BaseComponent = require("./components/BaseComponent");
 
 var _BusinessAndProductList = require("./components/BusinessAndProductList");
@@ -1001,6 +1015,8 @@ var _CustomerContext = require("./contexts/CustomerContext");
 var _ValidationsFieldsContext = require("./contexts/ValidationsFieldsContext");
 
 var _ToastContext = require("./contexts/ToastContext");
+
+var _PlaceSpot = require("./components/PlaceSpot");
 
 var _PaymethodList = require("./components/PaymethodList");
 
