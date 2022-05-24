@@ -50,6 +50,7 @@ import { PaymentOptionStripe } from '../src/components/PaymentOptionStripe'
 import { PaymentOptionStripeDirect } from '../src/components/PaymentOptionStripeDirect'
 import { PaymentOptionStripeRedirect } from '../src/components/PaymentOptionStripeRedirect'
 import { PaymentOptionWallet } from '../src/components/PaymentOptionWallet'
+import { PlaceSpot } from '../src/components/PlaceSpot'
 import { PhoneAutocomplete } from '../src/components/PhoneAutocomplete'
 import { ProductForm } from '../src/components/ProductForm'
 import { ProductImages } from '../src/components/ProductImages'
@@ -145,6 +146,7 @@ export {
   PaymentOptionStripeDirect,
   PaymentOptionStripeRedirect,
   PaymentOptionWallet,
+  PlaceSpot,
   PhoneAutocomplete,
   ProductForm,
   ProductImages,

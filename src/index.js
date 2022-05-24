@@ -1,6 +1,7 @@
 import { AddressDetails } from './components/AddressDetails'
 import { AddressForm } from './components/AddressForm'
 import { AddressList } from './components/AddressList'
+import { AnalyticsSegment } from './components/AnalyticsSegment'
 import { BaseComponent } from './components/BaseComponent'
 import { BusinessAndProductList } from './components/BusinessAndProductList'
 import { BusinessBasicInformation } from './components/BusinessBasicInformation'
@@ -86,6 +87,7 @@ import { OrderingContext, OrderingProvider } from './contexts/OrderingContext'
 import { CustomerContext, CustomerProvider, useCustomer } from './contexts/CustomerContext'
 import { ValidationFieldsContext, ValidationFieldsProvider, useValidationFields } from './contexts/ValidationsFieldsContext'
 import { ToastContext, ToastProvider, useToast, ToastType } from './contexts/ToastContext'
+import { PlaceSpot } from './components/PlaceSpot'
 import { PaymethodList } from './components/PaymethodList'
 import { PaymentOptionCash } from './components/PaymentOptionCash'
 import { PaymentOptionPaypal } from './components/PaymentOptionPaypal'
@@ -113,6 +115,7 @@ export {
   AddressForm,
   AddressList,
   AppleLogin,
+  AnalyticsSegment,
   BaseComponent,
   BusinessAndProductList,
   BusinessBasicInformation,
@@ -162,6 +165,7 @@ export {
   PaymentOptions,
   PaymentOptionWallet,
   PaymethodList,
+  PlaceSpot,
   Popup,
   ProductComponent,
   ProductForm,
