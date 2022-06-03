@@ -21,10 +21,13 @@ const configFile = {
 Sentry.init({
   environment: process.env.NODE_ENV,
   dsn: "https://752122325a48413ebc00c89d06b5bb1c@o460529.ingest.sentry.io/6302875",
+  release: 'ordering-components-release@' + process.env.npm_package_version,
   integrations: [
     new Integrations.BrowserTracing()
   ],
-  tracesSampleRate: 0.5
+  // Release health
+  autoSessionTracking: true,
+  tracesSampleRate: 0.2
 })
 
 const wrapper = document.getElementById('app')
