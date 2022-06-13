@@ -14,6 +14,7 @@ import { BusinessProductsSearch } from './components/BusinessProductsSearch'
 import { BusinessReviews } from './components/BusinessReviews'
 import { BusinessSortControl } from './components/BusinessSortControl'
 import { BusinessTypeFilter } from './components/BusinessTypeFilter'
+import { BusinessSearchList } from './components/BusinessSearchList'
 import { Cart } from './components/Cart'
 import { CartStoresListing } from './components/CartStoresListing'
 import { Checkout } from './components/Checkout'
@@ -128,6 +129,7 @@ export {
   BusinessReviews,
   BusinessSortControl,
   BusinessTypeFilter,
+  BusinessSearchList,
   Cart,
   CartStoresListing,
   Checkout,
