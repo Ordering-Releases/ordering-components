@@ -29,6 +29,10 @@ export const UserFormDetails = (props) => {
   const [isEdit, setIsEdit] = useState(!!props?.isEdit)
   const [userState, setUserState] = useState({ loading: false, loadingDriver: false, result: { error: false } })
   const [formState, setFormState] = useState({ loading: false, changes: {}, result: { error: false } })
+  const [verifyPhoneState, setVerifyPhoneState] = useState({ loading: false, result: { error: false } })
+  const [checkPhoneCodeState, setCheckPhoneCodeState] = useState({ loading: false, result: { error: false } })
+  const [removeAccountState, setAccountState] = useState({ loading: false, error: null, result: null })
+
   const requestsState = {}
 
   const accessToken = useDefualtSessionManager ? session.token : props.accessToken
@@ -286,6 +290,33 @@ export const UserFormDetails = (props) => {
     })
   }
 
+  const handleRemoveAccount = async (userId) => {
+    const idToDelete = userId ?? session.user.id
+    try {
+      setAccountState({ ...removeAccountState, loading: true })
+      const response = await fetch(`${ordering.root}/users/${idToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`
+        }
+      })
+      const res = await response.json()
+      setAccountState({
+        ...removeAccountState,
+        loading: false,
+        result: res?.result,
+        error: res?.error
+      })
+    } catch (error) {
+      setAccountState({
+        ...removeAccountState,
+        loading: false,
+        error: error.message
+      })
+    }
+  }
+
   return (
     <>
       {UIComponent && (
@@ -295,6 +326,7 @@ export const UserFormDetails = (props) => {
           cleanFormState={cleanFormState}
           formState={formState}
           userState={userState}
+          removeAccountState={removeAccountState}
           validationFields={validationFields}
           showField={showField}
           setFormState={setFormState}
@@ -305,6 +337,7 @@ export const UserFormDetails = (props) => {
           toggleIsEdit={() => setIsEdit(!isEdit)}
           handleToggleAvalaibleStatusDriver={handleToggleAvalaibleStatusDriver}
           handleChangePromotions={handleChangePromotions}
+          handleRemoveAccount={handleRemoveAccount}
         />
       )}
     </>
