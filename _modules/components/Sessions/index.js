@@ -5,7 +5,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.AppleLogin = void 0;
+exports.Sessions = void 0;
 
 var _react = _interopRequireWildcard(require("react"));
 
@@ -13,7 +13,7 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 
 var _ApiContext = require("../../contexts/ApiContext");
 
-var _ConfigContext = require("../../contexts/ConfigContext");
+var _SessionContext = require("../../contexts/SessionContext");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -47,251 +47,345 @@ function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Sy
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
-var AppleLogin = function AppleLogin(props) {
-  var _configs$apple_login_;
-
-  var UIComponent = props.UIComponent,
-      onSuccess = props.onSuccess,
-      onFailure = props.onFailure,
-      initParamsCustom = props.initParams,
-      handleButtonAppleLoginClick = props.handleButtonAppleLoginClick;
+var Sessions = function Sessions(props) {
+  var UIComponent = props.UIComponent;
 
   var _useApi = (0, _ApiContext.useApi)(),
       _useApi2 = _slicedToArray(_useApi, 1),
       ordering = _useApi2[0];
 
+  var _useSession = (0, _SessionContext.useSession)(),
+      _useSession2 = _slicedToArray(_useSession, 2),
+      _useSession2$ = _useSession2[0],
+      user = _useSession2$.user,
+      token = _useSession2$.token,
+      _useSession2$2 = _useSession2[1],
+      login = _useSession2$2.login,
+      logout = _useSession2$2.logout;
+
   var _useState = (0, _react.useState)({
-    loading: false,
-    result: {
-      error: false
-    }
+    sessions: [],
+    loading: true,
+    error: null
   }),
       _useState2 = _slicedToArray(_useState, 2),
-      formState = _useState2[0],
-      setFormState = _useState2[1];
+      sessionsList = _useState2[0],
+      setSessionsList = _useState2[1];
 
-  var _useConfig = (0, _ConfigContext.useConfig)(),
-      _useConfig2 = _slicedToArray(_useConfig, 1),
-      configs = _useConfig2[0].configs;
-
-  var initParams = initParamsCustom || {
-    clientId: configs === null || configs === void 0 ? void 0 : (_configs$apple_login_ = configs.apple_login_client_id) === null || _configs$apple_login_ === void 0 ? void 0 : _configs$apple_login_.value,
-    redirectURI: !window.location.origin.includes('localhost') ? "".concat(window.location.href, "login/apple/callback") : 'https://example-app.com/redirect',
-    response_mode: 'form_post',
-    response_type: 'code',
-    state: 'state',
-    scope: 'name email',
-    nonce: 'nonce',
-    usePopup: true // or true defaults to false
-
-  };
-  (0, _react.useEffect)(function () {
-    var AppleIDSignInOnFailure = document.addEventListener('AppleIDSignInOnFailure', function (error) {
-      onFailure(error);
-    });
-    createScriptApple();
-    return function () {
-      document.removeEventListener('AppleIDSignInOnFailure', AppleIDSignInOnFailure);
-    };
-  }, []);
+  var _useState3 = (0, _react.useState)({
+    loading: false,
+    error: null
+  }),
+      _useState4 = _slicedToArray(_useState3, 2),
+      actionState = _useState4[0],
+      setActionState = _useState4[1];
   /**
-   * loading script of de Apple login sdk
+   * Method to get the sessions from API
    */
 
-  var createScriptApple = function createScriptApple() {
-    if (window.document.getElementById('apple-login')) {
-      return;
-    }
 
-    var js = window.document.createElement('script');
-    js.id = 'apple-login';
-    js.src = 'https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js';
-    js.async = true;
-    js.defer = true;
-    window.document.body.appendChild(js);
-  };
-
-  var handleAppleLoginClick = /*#__PURE__*/function () {
-    var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(data) {
+  var handleGetSessions = /*#__PURE__*/function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
       var response, _yield$response$json, result, error;
 
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              if (!handleButtonAppleLoginClick) {
-                _context.next = 3;
-                break;
-              }
-
-              handleButtonAppleLoginClick(data);
-              return _context.abrupt("return");
-
-            case 3:
-              _context.prev = 3;
-              setFormState(_objectSpread(_objectSpread({}, formState), {}, {
+              _context.prev = 0;
+              setSessionsList(_objectSpread(_objectSpread({}, sessionsList), {}, {
                 loading: true
               }));
-              _context.next = 7;
-              return fetch("".concat(ordering.root, "/auth/apple"), {
-                method: 'POST',
+              _context.next = 4;
+              return fetch("".concat(ordering.root, "/users/").concat(user.id, "/sessions"), {
+                method: 'GET',
                 headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  code: data.code
-                })
+                  'Content-Type': 'application/json',
+                  Authorization: "Bearer ".concat(token)
+                }
               });
 
-            case 7:
+            case 4:
               response = _context.sent;
-              _context.next = 10;
+              _context.next = 7;
               return response.json();
 
-            case 10:
+            case 7:
               _yield$response$json = _context.sent;
               result = _yield$response$json.result;
               error = _yield$response$json.error;
-              setFormState({
-                result: result,
-                loading: false
-              });
 
-              if (onSuccess && !error && result !== null && result !== void 0 && result.session) {
-                onSuccess(result);
+              if (!error) {
+                setSessionsList({
+                  loading: false,
+                  error: null,
+                  sessions: result
+                });
               } else {
-                if (onFailure) {
-                  onFailure(result);
-                }
+                setSessionsList(_objectSpread(_objectSpread({}, sessionsList), {}, {
+                  loading: false,
+                  error: result
+                }));
               }
 
-              _context.next = 20;
+              _context.next = 16;
               break;
 
-            case 17:
-              _context.prev = 17;
-              _context.t0 = _context["catch"](3);
-              setFormState({
-                result: {
-                  error: true,
-                  result: _context.t0.message
-                },
-                loading: false
-              });
+            case 13:
+              _context.prev = 13;
+              _context.t0 = _context["catch"](0);
+              setSessionsList(_objectSpread(_objectSpread({}, sessionsList), {}, {
+                loading: false,
+                error: [_context.t0.message]
+              }));
 
-            case 20:
+            case 16:
             case "end":
               return _context.stop();
           }
         }
-      }, _callee, null, [[3, 17]]);
+      }, _callee, null, [[0, 13]]);
     }));
 
-    return function handleAppleLoginClick(_x) {
+    return function handleGetSessions() {
       return _ref.apply(this, arguments);
     };
   }();
   /**
-   * start Login Apple
+   * Method to delete the session from API
+   * @param {number} sessionId session id
    */
 
 
-  var initLoginApple = function initLoginApple() {
-    window.AppleID.auth.init(initParams);
-    handleLoginApple();
-  };
-  /**
-   * handilng the response of login apple when login
-   */
+  var handleDeleteSession = /*#__PURE__*/function () {
+    var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(session) {
+      var response, _yield$response$json2, result, error, sessions;
 
-
-  var handleLoginApple = /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-      var data;
       return _regeneratorRuntime().wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
               _context2.prev = 0;
-              _context2.next = 3;
-              return window.AppleID.auth.signIn();
+              setActionState(_objectSpread(_objectSpread({}, actionState), {}, {
+                loading: true
+              }));
+              _context2.next = 4;
+              return fetch("".concat(ordering.root, "/users/").concat(user.id, "/sessions/").concat(session.id), {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: "Bearer ".concat(token)
+                }
+              });
 
-            case 3:
-              data = _context2.sent;
-              handleAppleLoginClick(data === null || data === void 0 ? void 0 : data.authorization);
-              _context2.next = 10;
-              break;
+            case 4:
+              response = _context2.sent;
+              _context2.next = 7;
+              return response.json();
 
             case 7:
-              _context2.prev = 7;
-              _context2.t0 = _context2["catch"](0);
-              console.log('error', _context2.t0);
+              _yield$response$json2 = _context2.sent;
+              result = _yield$response$json2.result;
+              error = _yield$response$json2.error;
 
-            case 10:
+              if (!error) {
+                sessions = sessionsList.sessions.filter(function (_session) {
+                  return _session.id !== session.id;
+                });
+                setSessionsList(_objectSpread(_objectSpread({}, sessionsList), {}, {
+                  sessions: sessions
+                }));
+                setActionState({
+                  loading: false,
+                  error: null
+                });
+
+                if (session.current) {
+                  logout();
+                }
+              } else {
+                setActionState({
+                  loading: false,
+                  error: result
+                });
+              }
+
+              _context2.next = 16;
+              break;
+
+            case 13:
+              _context2.prev = 13;
+              _context2.t0 = _context2["catch"](0);
+              setActionState({
+                loading: false,
+                error: [_context2.t0.message]
+              });
+
+            case 16:
             case "end":
               return _context2.stop();
           }
         }
-      }, _callee2, null, [[0, 7]]);
+      }, _callee2, null, [[0, 13]]);
     }));
 
-    return function handleLoginApple() {
+    return function handleDeleteSession(_x) {
       return _ref2.apply(this, arguments);
     };
   }();
+  /**
+   * Method to delete all sessions
+   */
 
+
+  var handleDeleteAllSessions = /*#__PURE__*/function () {
+    var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      var deleteCurrent,
+          response,
+          _yield$response$json3,
+          result,
+          error,
+          _args3 = arguments;
+
+      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              deleteCurrent = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : false;
+              _context3.prev = 1;
+              setActionState(_objectSpread(_objectSpread({}, actionState), {}, {
+                loading: true
+              }));
+              _context3.next = 5;
+              return fetch("".concat(ordering.root, "/users/").concat(user.id, "/sessions/all"), {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: "Bearer ".concat(token)
+                },
+                body: JSON.stringify({
+                  delete_current: deleteCurrent
+                })
+              });
+
+            case 5:
+              response = _context3.sent;
+              _context3.next = 8;
+              return response.json();
+
+            case 8:
+              _yield$response$json3 = _context3.sent;
+              result = _yield$response$json3.result;
+              error = _yield$response$json3.error;
+
+              if (!error) {
+                setActionState({
+                  loading: false,
+                  error: null
+                });
+
+                if (deleteCurrent) {
+                  setSessionsList(_objectSpread(_objectSpread({}, sessionsList), {}, {
+                    sessions: []
+                  }));
+                  logout();
+                } else {
+                  setSessionsList(_objectSpread(_objectSpread({}, sessionsList), {}, {
+                    sessions: sessionsList.sessions.filter(function (session) {
+                      return session.current;
+                    })
+                  }));
+
+                  if ((user === null || user === void 0 ? void 0 : user.session_strategy) === 'jwt') {
+                    login({
+                      token: token,
+                      user: _objectSpread(_objectSpread({}, user), {}, {
+                        session_strategy: 'jwt_session'
+                      })
+                    });
+                  }
+                }
+              } else {
+                setActionState({
+                  loading: false,
+                  error: result
+                });
+              }
+
+              _context3.next = 17;
+              break;
+
+            case 14:
+              _context3.prev = 14;
+              _context3.t0 = _context3["catch"](1);
+              setActionState({
+                loading: false,
+                error: [_context3.t0.message]
+              });
+
+            case 17:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, _callee3, null, [[1, 14]]);
+    }));
+
+    return function handleDeleteAllSessions() {
+      return _ref3.apply(this, arguments);
+    };
+  }();
+
+  (0, _react.useEffect)(function () {
+    if ((user === null || user === void 0 ? void 0 : user.session_strategy) === 'jwt_session') {
+      handleGetSessions();
+    } else {
+      setSessionsList(_objectSpread(_objectSpread({}, sessionsList), {}, {
+        loading: false,
+        sessions: []
+      }));
+    }
+  }, [user === null || user === void 0 ? void 0 : user.session_strategy]);
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, UIComponent && /*#__PURE__*/_react.default.createElement(UIComponent, _extends({}, props, {
-    initLoginApple: initLoginApple
+    sessionsList: sessionsList,
+    actionState: actionState,
+    handleDeleteSession: handleDeleteSession,
+    handleDeleteAllSessions: handleDeleteAllSessions
   })));
 };
 
-exports.AppleLogin = AppleLogin;
-AppleLogin.propTypes = {
+exports.Sessions = Sessions;
+Sessions.propTypes = {
   /**
    * UI Component, this must be containt all graphic elements and use parent props
    */
   UIComponent: _propTypes.default.elementType,
 
   /**
-   * loading script of de Apple login sdk
-   */
-  createScriptApple: _propTypes.default.func,
-
-  /**
-   * start Login Apple
-   */
-  initLoginApple: _propTypes.default.func,
-
-  /**
-   * handilng the response of login apple when login
-   */
-  handleLoginApple: _propTypes.default.func,
-
-  /**
-   * Components types before Facebook login button
+   * Components types before Sessions list
    * Array of type components, the parent props will pass to these components
    */
   beforeComponents: _propTypes.default.arrayOf(_propTypes.default.elementType),
 
   /**
-   * Components types after Facebook login button
+   * Components types after Sessions list
    * Array of type components, the parent props will pass to these components
    */
   afterComponents: _propTypes.default.arrayOf(_propTypes.default.elementType),
 
   /**
-   * Elements before Facebook login button
+   * Elements before Sessions list
    * Array of HTML/Components elements, these components will not get the parent props
    */
   beforeElements: _propTypes.default.arrayOf(_propTypes.default.element),
 
   /**
-   * Elements after Facebook login button
+   * Elements after Sessions list
    * Array of HTML/Components elements, these components will not get the parent props
    */
   afterElements: _propTypes.default.arrayOf(_propTypes.default.element)
 };
-AppleLogin.defaultProps = {
+Sessions.defaultProps = {
   beforeComponents: [],
   afterComponents: [],
   beforeElements: [],

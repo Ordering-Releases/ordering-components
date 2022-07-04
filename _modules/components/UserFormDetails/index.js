@@ -117,6 +117,35 @@ var UserFormDetails = function UserFormDetails(props) {
       formState = _useState6[0],
       setFormState = _useState6[1];
 
+  var _useState7 = (0, _react.useState)({
+    loading: false,
+    result: {
+      error: false
+    }
+  }),
+      _useState8 = _slicedToArray(_useState7, 2),
+      verifyPhoneState = _useState8[0],
+      setVerifyPhoneState = _useState8[1];
+
+  var _useState9 = (0, _react.useState)({
+    loading: false,
+    result: {
+      error: false
+    }
+  }),
+      _useState10 = _slicedToArray(_useState9, 2),
+      checkPhoneCodeState = _useState10[0],
+      setCheckPhoneCodeState = _useState10[1];
+
+  var _useState11 = (0, _react.useState)({
+    loading: false,
+    error: null,
+    result: null
+  }),
+      _useState12 = _slicedToArray(_useState11, 2),
+      removeAccountState = _useState12[0],
+      setAccountState = _useState12[1];
+
   var requestsState = {};
   var accessToken = useDefualtSessionManager ? session.token : props.accessToken;
   (0, _react.useEffect)(function () {
@@ -441,11 +470,69 @@ var UserFormDetails = function UserFormDetails(props) {
     }));
   };
 
+  var handleRemoveAccount = /*#__PURE__*/function () {
+    var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(userId) {
+      var idToDelete, response, res;
+      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              idToDelete = userId !== null && userId !== void 0 ? userId : session.user.id;
+              _context3.prev = 1;
+              setAccountState(_objectSpread(_objectSpread({}, removeAccountState), {}, {
+                loading: true
+              }));
+              _context3.next = 5;
+              return fetch("".concat(ordering.root, "/users/").concat(idToDelete), {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: "Bearer ".concat(accessToken)
+                }
+              });
+
+            case 5:
+              response = _context3.sent;
+              _context3.next = 8;
+              return response.json();
+
+            case 8:
+              res = _context3.sent;
+              setAccountState(_objectSpread(_objectSpread({}, removeAccountState), {}, {
+                loading: false,
+                result: res === null || res === void 0 ? void 0 : res.result,
+                error: res === null || res === void 0 ? void 0 : res.error
+              }));
+              _context3.next = 15;
+              break;
+
+            case 12:
+              _context3.prev = 12;
+              _context3.t0 = _context3["catch"](1);
+              setAccountState(_objectSpread(_objectSpread({}, removeAccountState), {}, {
+                loading: false,
+                error: _context3.t0.message
+              }));
+
+            case 15:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, _callee3, null, [[1, 12]]);
+    }));
+
+    return function handleRemoveAccount(_x5) {
+      return _ref3.apply(this, arguments);
+    };
+  }();
+
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, UIComponent && /*#__PURE__*/_react.default.createElement(UIComponent, _extends({}, props, {
     isEdit: isEdit,
     cleanFormState: cleanFormState,
     formState: formState,
     userState: userState,
+    removeAccountState: removeAccountState,
     validationFields: validationFields,
     showField: showField,
     setFormState: setFormState,
@@ -457,7 +544,8 @@ var UserFormDetails = function UserFormDetails(props) {
       return setIsEdit(!isEdit);
     },
     handleToggleAvalaibleStatusDriver: handleToggleAvalaibleStatusDriver,
-    handleChangePromotions: handleChangePromotions
+    handleChangePromotions: handleChangePromotions,
+    handleRemoveAccount: handleRemoveAccount
   })));
 };
 
