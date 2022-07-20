@@ -24,7 +24,8 @@ export const BusinessAndProductList = (props) => {
     location
   } = props
 
-  const [orderState] = useOrder()
+  const [orderState, { removeProduct }] = useOrder()
+  const [alertState, setAlertState] = useState({ open: false, content: [] })
   const [{ configs }] = useConfig()
   const [languageState, t] = useLanguage()
 
@@ -627,6 +628,16 @@ export const BusinessAndProductList = (props) => {
     }
   }
 
+  const multiRemoveProducts = async (unavailableProducts, carts) => {
+    const allPromise = []
+    unavailableProducts.forEach(product => {
+      allPromise.push(new Promise((resolve, reject) => {
+        resolve(removeProduct(product, carts))
+      }))
+    })
+    await Promise.all(allPromise) && setAlertState({ open: true, content: [t('NOT_AVAILABLE_PRODUCT', 'This product is not available.')] })
+  }
+
   useEffect(() => {
     if (!businessState.loading) {
       loadProducts({ newFetch: true })
@@ -732,6 +743,9 @@ export const BusinessAndProductList = (props) => {
           handleChangeFilterByMenus={handleChangeFilterByMenus}
           getNextProducts={loadMoreProducts}
           updateProductModal={(val) => setProductModal({ ...productModal, product: val })}
+          multiRemoveProducts={multiRemoveProducts}
+          setAlertState={setAlertState}
+          alertState={alertState}
         />
       )}
     </>
