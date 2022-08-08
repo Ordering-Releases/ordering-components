@@ -5,7 +5,6 @@ import utc from 'dayjs/plugin/utc'
 import { useOrder } from '../../contexts/OrderContext'
 import { useLanguage } from '../../contexts/LanguageContext'
 import { useConfig } from '../../contexts/ConfigContext'
-
 dayjs.extend(utc)
 
 export const BusinessAndProductList = (props) => {
@@ -154,6 +153,62 @@ export const BusinessAndProductList = (props) => {
     )
   }
 
+  const handleUpdateProducts = (productId, changes) => {
+    const updatedProducts = categoryState?.products.map(product => {
+      if (product?.id === productId) {
+        return {
+          ...product,
+          ...changes
+        }
+      }
+      return product
+    })
+    setCategoryState({
+      ...categoryState,
+      products: updatedProducts
+    })
+    if (categoriesState?.featured?.products) {
+      const updatedFeaturedProducts = categoriesState?.featured?.products.map(product => {
+        if (product?.id === productId) {
+          return {
+            ...product,
+            ...changes
+          }
+        }
+        return product
+      })
+      setCategoriesState({
+        ...categoriesState,
+        featured: {
+          ...categoriesState.featured,
+          products: updatedFeaturedProducts
+        }
+      })
+    }
+    const updatedCategories = businessState?.business?.categories?.map(_category => {
+      const updatedProducts = _category?.products.map(_product => {
+        if (_product?.id === productId) {
+          return {
+            ..._product,
+            ...changes
+          }
+        }
+        return _product
+      })
+      return {
+        ..._category,
+        products: updatedProducts
+      }
+    })
+    setBusinessState({
+      ...businessState,
+      business: {
+        ...businessState?.business,
+        categories: updatedCategories
+      }
+    })
+  }
+
   const getProducts = async () => {
     for (let i = 0; i < businessState?.business?.categories?.length ?? 0; i++) {
       const category = businessState?.business?.categories[i]
@@ -198,6 +253,7 @@ export const BusinessAndProductList = (props) => {
       categoryState.products = productsFiltered || []
     }
     categoryState.products = sortProductsArray(sortByValue, categoryState.products)
+    setErrorQuantityProducts(!categoryState.products?.length)
     setCategoryState({ ...categoryState })
   }
 
@@ -349,6 +405,7 @@ export const BusinessAndProductList = (props) => {
             ? [...featuredRes?.content?.result]
             : oldFeatured?.products?.concat(featuredRes?.content?.result)
         }
+        setErrorQuantityProducts(!featureState.products?.length)
         categoriesState.featured = featureState
       }
 
@@ -363,7 +420,7 @@ export const BusinessAndProductList = (props) => {
           loading: false,
           products: result
         }
-
+        setErrorQuantityProducts(!newcategoryState.products?.length)
         categoriesState[categoryKey] = newcategoryState
         categoryState = newcategoryState
         setCategoryState({ ...newcategoryState })
@@ -596,11 +653,7 @@ export const BusinessAndProductList = (props) => {
         .parameters(parameters)
         .get({ cancelToken: source })
 
-      if (!result?.categories || result?.categories?.length === 0) {
-        setErrorQuantityProducts(true)
-      } else {
-        setErrorQuantityProducts(false)
-      }
+      setErrorQuantityProducts(!result?.categories || result?.categories?.length === 0)
 
       const data = {
         ...businessState,
@@ -746,6 +799,7 @@ export const BusinessAndProductList = (props) => {
           multiRemoveProducts={multiRemoveProducts}
           setAlertState={setAlertState}
           alertState={alertState}
+          handleUpdateProducts={handleUpdateProducts}
         />
       )}
     </>

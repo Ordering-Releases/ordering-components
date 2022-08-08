@@ -124,7 +124,7 @@ export const Checkout = (props) => {
   /**
    * Method to handle click on Place order
    */
-  const handlerClickPlaceOrder = async (paymentOptions) => {
+  const handlerClickPlaceOrder = async (paymentOptions, payloadProps, confirmPayment) => {
     let paymethodData = paymethodSelected?.data
     if (paymethodSelected?.paymethod && ['stripe', 'stripe_connect', 'stripe_direct'].includes(paymethodSelected?.paymethod?.gateway)) {
       paymethodData = {
@@ -133,14 +133,14 @@ export const Checkout = (props) => {
     }
     let payload = {
       offer_id: cart.offer_id,
-      amount: cart?.balance ?? cart?.total,
+      amount: cart?.balance ?? cart?.total
     }
 
     if (paymethodSelected?.paymethod) {
       payload = {
         ...payload,
         paymethod_id: paymethodSelected?.paymethodId,
-        paymethod_data: paymethodSelected?.data,
+        paymethod_data: paymethodSelected?.data
       }
     }
 
@@ -158,6 +158,7 @@ export const Checkout = (props) => {
 
     payload = {
       ...payload,
+      ...payloadProps,
       paymethod_data: {
         ...paymethodData,
         ...paymentOptions
@@ -176,6 +177,12 @@ export const Checkout = (props) => {
 
     if (cartResult?.paymethod_data?.status === 2 && actionsBeforePlace) {
       await actionsBeforePlace(paymethodSelected, result.result)
+    }
+    if (confirmPayment && result?.result?.paymethod_data?.gateway === 'apple_pay') {
+      const { error: confirmApplePayError } = await confirmPayment(result?.result?.paymethod_data?.result?.client_secret)
+      if (confirmApplePayError) {
+        setErrors(confirmApplePayError)
+      }
     }
     setPlacing(false)
     onPlaceOrderClick && onPlaceOrderClick(payload, paymethodSelected, cartResult)
@@ -267,7 +274,9 @@ export const Checkout = (props) => {
   }
 
   useEffect(() => {
-    getBusiness()
+    if (businessId && typeof businessId === 'number') {
+      getBusiness()
+    }
   }, [businessId])
 
   /**
@@ -280,7 +289,7 @@ export const Checkout = (props) => {
         paymethod_data: paymethodSelected?.data,
         delivery_zone_id: cart.delivery_zone_id,
         offer_id: cart.offer_id,
-        amount: cart?.balance ?? cart?.total,
+        amount: cart?.balance ?? cart?.total
       }
       onPlaceOrderClick && onPlaceOrderClick(data, paymethodSelected, cart)
     }
