@@ -64,7 +64,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 _dayjs.default.extend(_utc.default);
 
 var BusinessAndProductList = function BusinessAndProductList(props) {
-  var _configs$use_parent_c, _configs$use_parent_c2, _businessState$busine15, _orderState$options26, _orderState$options27, _orderState$options28, _orderState$options29;
+  var _configs$use_parent_c, _configs$use_parent_c2, _businessState$busine17, _orderState$options26, _orderState$options27, _orderState$options28, _orderState$options29;
 
   var isSearchByName = props.isSearchByName,
       isSearchByDescription = props.isSearchByDescription,
@@ -291,9 +291,61 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
     }));
   };
 
+  var handleUpdateProducts = function handleUpdateProducts(productId, changes) {
+    var _categoryState, _categoriesState$feat, _businessState$busine, _businessState$busine2;
+
+    var updatedProducts = (_categoryState = categoryState) === null || _categoryState === void 0 ? void 0 : _categoryState.products.map(function (product) {
+      if ((product === null || product === void 0 ? void 0 : product.id) === productId) {
+        return _objectSpread(_objectSpread({}, product), changes);
+      }
+
+      return product;
+    });
+    setCategoryState(_objectSpread(_objectSpread({}, categoryState), {}, {
+      products: updatedProducts
+    }));
+
+    if (categoriesState !== null && categoriesState !== void 0 && (_categoriesState$feat = categoriesState.featured) !== null && _categoriesState$feat !== void 0 && _categoriesState$feat.products) {
+      var _categoriesState$feat2;
+
+      var updatedFeaturedProducts = categoriesState === null || categoriesState === void 0 ? void 0 : (_categoriesState$feat2 = categoriesState.featured) === null || _categoriesState$feat2 === void 0 ? void 0 : _categoriesState$feat2.products.map(function (product) {
+        if ((product === null || product === void 0 ? void 0 : product.id) === productId) {
+          return _objectSpread(_objectSpread({}, product), changes);
+        }
+
+        return product;
+      });
+      setCategoriesState(_objectSpread(_objectSpread({}, categoriesState), {}, {
+        featured: _objectSpread(_objectSpread({}, categoriesState.featured), {}, {
+          products: updatedFeaturedProducts
+        })
+      }));
+    }
+
+    var updatedCategories = businessState === null || businessState === void 0 ? void 0 : (_businessState$busine = businessState.business) === null || _businessState$busine === void 0 ? void 0 : (_businessState$busine2 = _businessState$busine.categories) === null || _businessState$busine2 === void 0 ? void 0 : _businessState$busine2.map(function (_category) {
+      var updatedProducts = _category === null || _category === void 0 ? void 0 : _category.products.map(function (_product) {
+        if ((_product === null || _product === void 0 ? void 0 : _product.id) === productId) {
+          return _objectSpread(_objectSpread({}, _product), changes);
+        }
+
+        return _product;
+      });
+      return _objectSpread(_objectSpread({}, _category), {}, {
+        products: updatedProducts
+      });
+    });
+    setBusinessState(_objectSpread(_objectSpread({}, businessState), {}, {
+      business: _objectSpread(_objectSpread({}, businessState === null || businessState === void 0 ? void 0 : businessState.business), {}, {
+        categories: updatedCategories
+      })
+    }));
+  };
+
   var getProducts = /*#__PURE__*/function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-      var i, _ref2, _businessState$busine, _businessState$busine2, _businessState$busine3, _category$products, category, isFeatured, categoryState, _businessState$busine4, _ref3, _businessState$busine5, _businessState$busine6, _categories$find, _subCategoriesList$fi, _businessState$busine7, _businessState$busine8, _businessState$busine9, categoriesList, categories, parentCategory, categoryFinded, productsFiltered, _businessState$busine10, _businessState$busine11, _productsFiltered, _businessState$busine12, _businessState$busine13, _productsFiltered2;
+      var _categoryState$produc;
+
+      var i, _ref2, _businessState$busine3, _businessState$busine4, _businessState$busine5, _category$products, category, isFeatured, categoryState, _businessState$busine6, _ref3, _businessState$busine7, _businessState$busine8, _categories$find, _subCategoriesList$fi, _businessState$busine9, _businessState$busine10, _businessState$busine11, categoriesList, categories, parentCategory, categoryFinded, productsFiltered, _businessState$busine12, _businessState$busine13, _productsFiltered, _businessState$busine14, _businessState$busine15, _productsFiltered2;
 
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) {
@@ -302,12 +354,12 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
               i = 0;
 
             case 1:
-              if (!((_ref2 = i < (businessState === null || businessState === void 0 ? void 0 : (_businessState$busine = businessState.business) === null || _businessState$busine === void 0 ? void 0 : (_businessState$busine2 = _businessState$busine.categories) === null || _businessState$busine2 === void 0 ? void 0 : _businessState$busine2.length)) !== null && _ref2 !== void 0 ? _ref2 : 0)) {
+              if (!((_ref2 = i < (businessState === null || businessState === void 0 ? void 0 : (_businessState$busine3 = businessState.business) === null || _businessState$busine3 === void 0 ? void 0 : (_businessState$busine4 = _businessState$busine3.categories) === null || _businessState$busine4 === void 0 ? void 0 : _businessState$busine4.length)) !== null && _ref2 !== void 0 ? _ref2 : 0)) {
                 _context.next = 10;
                 break;
               }
 
-              category = businessState === null || businessState === void 0 ? void 0 : (_businessState$busine3 = businessState.business) === null || _businessState$busine3 === void 0 ? void 0 : _businessState$busine3.categories[i];
+              category = businessState === null || businessState === void 0 ? void 0 : (_businessState$busine5 = businessState.business) === null || _businessState$busine5 === void 0 ? void 0 : _businessState$busine5.categories[i];
               isFeatured = category === null || category === void 0 ? void 0 : (_category$products = category.products) === null || _category$products === void 0 ? void 0 : _category$products.some(function (product) {
                 return product.featured;
               });
@@ -331,20 +383,20 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
               });
 
               if (categorySelected.id !== 'featured' && categorySelected.id !== null) {
-                iterateCategories(businessState === null || businessState === void 0 ? void 0 : (_businessState$busine4 = businessState.business) === null || _businessState$busine4 === void 0 ? void 0 : _businessState$busine4.categories);
-                categoriesList = (_ref3 = []).concat.apply(_ref3, _toConsumableArray(businessState === null || businessState === void 0 ? void 0 : (_businessState$busine5 = businessState.business) === null || _businessState$busine5 === void 0 ? void 0 : _businessState$busine5.categories.map(function (category) {
+                iterateCategories(businessState === null || businessState === void 0 ? void 0 : (_businessState$busine6 = businessState.business) === null || _businessState$busine6 === void 0 ? void 0 : _businessState$busine6.categories);
+                categoriesList = (_ref3 = []).concat.apply(_ref3, _toConsumableArray(businessState === null || businessState === void 0 ? void 0 : (_businessState$busine7 = businessState.business) === null || _businessState$busine7 === void 0 ? void 0 : _businessState$busine7.categories.map(function (category) {
                   return category.children;
                 })));
-                categories = isUseParentCategory ? categoriesList : businessState === null || businessState === void 0 ? void 0 : (_businessState$busine6 = businessState.business) === null || _businessState$busine6 === void 0 ? void 0 : _businessState$busine6.categories;
+                categories = isUseParentCategory ? categoriesList : businessState === null || businessState === void 0 ? void 0 : (_businessState$busine8 = businessState.business) === null || _businessState$busine8 === void 0 ? void 0 : _businessState$busine8.categories;
                 parentCategory = (_categories$find = categories === null || categories === void 0 ? void 0 : categories.find(function (category) {
                   return category.category_id === categorySelected.id;
                 })) !== null && _categories$find !== void 0 ? _categories$find : {};
                 categoryFinded = (_subCategoriesList$fi = subCategoriesList.find(function (subCat) {
                   return subCat.id === parentCategory.category_id;
                 })) !== null && _subCategoriesList$fi !== void 0 ? _subCategoriesList$fi : {};
-                productsFiltered = businessState === null || businessState === void 0 ? void 0 : (_businessState$busine7 = businessState.business) === null || _businessState$busine7 === void 0 ? void 0 : (_businessState$busine8 = _businessState$busine7.categories) === null || _businessState$busine8 === void 0 ? void 0 : (_businessState$busine9 = _businessState$busine8.find(function (category) {
+                productsFiltered = businessState === null || businessState === void 0 ? void 0 : (_businessState$busine9 = businessState.business) === null || _businessState$busine9 === void 0 ? void 0 : (_businessState$busine10 = _businessState$busine9.categories) === null || _businessState$busine10 === void 0 ? void 0 : (_businessState$busine11 = _businessState$busine10.find(function (category) {
                   return category.id === (isUseParentCategory ? parentCategory === null || parentCategory === void 0 ? void 0 : parentCategory.parent_category_id : categorySelected.id);
-                })) === null || _businessState$busine9 === void 0 ? void 0 : _businessState$busine9.products.filter(function (product) {
+                })) === null || _businessState$busine11 === void 0 ? void 0 : _businessState$busine11.products.filter(function (product) {
                   var _categoryFinded$child;
 
                   return isUseParentCategory ? (categoryFinded === null || categoryFinded === void 0 ? void 0 : (_categoryFinded$child = categoryFinded.children) === null || _categoryFinded$child === void 0 ? void 0 : _categoryFinded$child.some(function (cat) {
@@ -353,14 +405,14 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
                 });
                 categoryState.products = productsFiltered || [];
               } else if (categorySelected.id === 'featured') {
-                _productsFiltered = businessState === null || businessState === void 0 ? void 0 : (_businessState$busine10 = businessState.business) === null || _businessState$busine10 === void 0 ? void 0 : (_businessState$busine11 = _businessState$busine10.categories) === null || _businessState$busine11 === void 0 ? void 0 : _businessState$busine11.reduce(function (products, category) {
+                _productsFiltered = businessState === null || businessState === void 0 ? void 0 : (_businessState$busine12 = businessState.business) === null || _businessState$busine12 === void 0 ? void 0 : (_businessState$busine13 = _businessState$busine12.categories) === null || _businessState$busine13 === void 0 ? void 0 : _businessState$busine13.reduce(function (products, category) {
                   return [].concat(_toConsumableArray(products), _toConsumableArray(category.products));
                 }, []).filter(function (product) {
                   return isFeaturedSearch(product);
                 });
                 categoryState.products = _productsFiltered || [];
               } else {
-                _productsFiltered2 = businessState === null || businessState === void 0 ? void 0 : (_businessState$busine12 = businessState.business) === null || _businessState$busine12 === void 0 ? void 0 : (_businessState$busine13 = _businessState$busine12.categories) === null || _businessState$busine13 === void 0 ? void 0 : _businessState$busine13.reduce(function (products, category) {
+                _productsFiltered2 = businessState === null || businessState === void 0 ? void 0 : (_businessState$busine14 = businessState.business) === null || _businessState$busine14 === void 0 ? void 0 : (_businessState$busine15 = _businessState$busine14.categories) === null || _businessState$busine15 === void 0 ? void 0 : _businessState$busine15.reduce(function (products, category) {
                   return [].concat(_toConsumableArray(products), _toConsumableArray(category.products));
                 }, []).filter(function (product) {
                   return isMatchSearch(product.name, product.description);
@@ -369,9 +421,10 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
               }
 
               categoryState.products = sortProductsArray(sortByValue, categoryState.products);
+              setErrorQuantityProducts(!((_categoryState$produc = categoryState.products) !== null && _categoryState$produc !== void 0 && _categoryState$produc.length));
               setCategoryState(_objectSpread({}, categoryState));
 
-            case 14:
+            case 15:
             case "end":
               return _context.stop();
           }
@@ -507,7 +560,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
 
   var loadProducts = /*#__PURE__*/function () {
     var _ref6 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-      var _categoriesState$cate, _curCategoryState$pro, _businessState$busine14;
+      var _categoriesState$cate, _curCategoryState$pro, _businessState$busine16;
 
       var _ref7,
           newFetch,
@@ -536,17 +589,19 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
           _featuredRes$content11,
           _oldFeatured$products,
           _featuredRes$content12,
+          _featureState$product,
           oldFeatured,
           featureState,
-          _categoriesState$feat,
-          _categoriesState$feat2,
+          _newcategoryState$pro,
+          _categoriesState$feat3,
+          _categoriesState$feat4,
           newcategoryState,
           isFeatured,
           _ref8,
           _featuredRes$content$,
           _featuredRes$content13,
-          _categoriesState$feat3,
-          _categoriesState$feat4,
+          _categoriesState$feat5,
+          _categoriesState$feat6,
           _curCategoryState$pag,
           _featuredRes$content14,
           _featuredRes$content15,
@@ -554,8 +609,8 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
           _featuredRes$content17,
           _featuredRes$content18,
           _featuredRes$content19,
-          _categoriesState$feat5,
-          _categoriesState$feat6,
+          _categoriesState$feat7,
+          _categoriesState$feat8,
           productsList,
           productsListFeatured,
           paginationData,
@@ -583,7 +638,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
               return _context3.abrupt("return");
 
             case 5:
-              isLazy = !!(businessState !== null && businessState !== void 0 && (_businessState$busine14 = businessState.business) !== null && _businessState$busine14 !== void 0 && _businessState$busine14.lazy_load_products_recommended);
+              isLazy = !!(businessState !== null && businessState !== void 0 && (_businessState$busine16 = businessState.business) !== null && _businessState$busine16 !== void 0 && _businessState$busine16.lazy_load_products_recommended);
 
               if (isLazy) {
                 _context3.next = 9;
@@ -644,6 +699,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
                   loading: false,
                   products: newFetch ? _toConsumableArray(featuredRes === null || featuredRes === void 0 ? void 0 : (_featuredRes$content11 = featuredRes.content) === null || _featuredRes$content11 === void 0 ? void 0 : _featuredRes$content11.result) : oldFeatured === null || oldFeatured === void 0 ? void 0 : (_oldFeatured$products = oldFeatured.products) === null || _oldFeatured$products === void 0 ? void 0 : _oldFeatured$products.concat(featuredRes === null || featuredRes === void 0 ? void 0 : (_featuredRes$content12 = featuredRes.content) === null || _featuredRes$content12 === void 0 ? void 0 : _featuredRes$content12.result)
                 };
+                setErrorQuantityProducts(!((_featureState$product = featureState.products) !== null && _featureState$product !== void 0 && _featureState$product.length));
                 categoriesState.featured = featureState;
               }
 
@@ -657,13 +713,14 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
                   loading: false,
                   products: result
                 };
+                setErrorQuantityProducts(!((_newcategoryState$pro = newcategoryState.products) !== null && _newcategoryState$pro !== void 0 && _newcategoryState$pro.length));
                 categoriesState[categoryKey] = newcategoryState;
                 categoryState = newcategoryState;
                 setCategoryState(_objectSpread({}, newcategoryState));
                 setCategoriesState(_objectSpread({}, categoriesState));
                 isFeatured = categoriesState.all.products.some(function (product) {
                   return product.featured;
-                }) || (categoriesState === null || categoriesState === void 0 ? void 0 : (_categoriesState$feat = categoriesState.featured) === null || _categoriesState$feat === void 0 ? void 0 : (_categoriesState$feat2 = _categoriesState$feat.products) === null || _categoriesState$feat2 === void 0 ? void 0 : _categoriesState$feat2.some(function (product) {
+                }) || (categoriesState === null || categoriesState === void 0 ? void 0 : (_categoriesState$feat3 = categoriesState.featured) === null || _categoriesState$feat3 === void 0 ? void 0 : (_categoriesState$feat4 = _categoriesState$feat3.products) === null || _categoriesState$feat4 === void 0 ? void 0 : _categoriesState$feat4.some(function (product) {
                   return product.featured;
                 }));
                 setFeaturedProducts(isFeatured);
@@ -676,7 +733,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
                   return item;
                 });
                 productsListFeatured = (_featuredRes$content$ = featuredRes === null || featuredRes === void 0 ? void 0 : (_featuredRes$content13 = featuredRes.content) === null || _featuredRes$content13 === void 0 ? void 0 : _featuredRes$content13.result) !== null && _featuredRes$content$ !== void 0 ? _featuredRes$content$ : [];
-                paginationData = categorySelected.id === 'featured' ? (_categoriesState$feat3 = categoriesState === null || categoriesState === void 0 ? void 0 : (_categoriesState$feat4 = categoriesState.featured) === null || _categoriesState$feat4 === void 0 ? void 0 : _categoriesState$feat4.pagination) !== null && _categoriesState$feat3 !== void 0 ? _categoriesState$feat3 : {} : (_curCategoryState$pag = curCategoryState === null || curCategoryState === void 0 ? void 0 : curCategoryState.pagination) !== null && _curCategoryState$pag !== void 0 ? _curCategoryState$pag : {};
+                paginationData = categorySelected.id === 'featured' ? (_categoriesState$feat5 = categoriesState === null || categoriesState === void 0 ? void 0 : (_categoriesState$feat6 = categoriesState.featured) === null || _categoriesState$feat6 === void 0 ? void 0 : _categoriesState$feat6.pagination) !== null && _categoriesState$feat5 !== void 0 ? _categoriesState$feat5 : {} : (_curCategoryState$pag = curCategoryState === null || curCategoryState === void 0 ? void 0 : curCategoryState.pagination) !== null && _curCategoryState$pag !== void 0 ? _curCategoryState$pag : {};
                 _newcategoryState = {
                   pagination: _objectSpread(_objectSpread({}, paginationData), {}, {
                     currentPage: categorySelected.id === 'featured' ? featuredRes === null || featuredRes === void 0 ? void 0 : (_featuredRes$content14 = featuredRes.content) === null || _featuredRes$content14 === void 0 ? void 0 : (_featuredRes$content15 = _featuredRes$content14.pagination) === null || _featuredRes$content15 === void 0 ? void 0 : _featuredRes$content15.current_page : pagination.current_page,
@@ -691,7 +748,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
                 setCategoriesState(_objectSpread({}, categoriesState));
                 _isFeatured = categoriesState.all.products.some(function (product) {
                   return product.featured;
-                }) || (categoriesState === null || categoriesState === void 0 ? void 0 : (_categoriesState$feat5 = categoriesState.featured) === null || _categoriesState$feat5 === void 0 ? void 0 : (_categoriesState$feat6 = _categoriesState$feat5.products) === null || _categoriesState$feat6 === void 0 ? void 0 : _categoriesState$feat6.some(function (product) {
+                }) || (categoriesState === null || categoriesState === void 0 ? void 0 : (_categoriesState$feat7 = categoriesState.featured) === null || _categoriesState$feat7 === void 0 ? void 0 : (_categoriesState$feat8 = _categoriesState$feat7.products) === null || _categoriesState$feat8 === void 0 ? void 0 : _categoriesState$feat8.some(function (product) {
                   return product.featured;
                 }));
                 setFeaturedProducts(_isFeatured);
@@ -728,7 +785,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
     var _ref9 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
       var _categoriesState$cate2;
 
-      var curCategoryState, _featuredRes$content20, _yield$getLazyProduct3, _yield$getLazyProduct4, lazyRes, featuredRes, _lazyRes$content2, error, result, pagination, errorsList, _featuredRes$content21, _featuredRes$content22, _featuredRes$content23, _featuredRes$content24, _featuredRes$content25, _featuredRes$content26, _featuredRes$content27, _featuredRes$content28, oldFeatured, featureState, _categoriesState$feat7, _categoriesState$feat8, newcategoryState, isFeatured, _ref10, _featuredRes$content$2, _featuredRes$content29, _categoriesState$feat9, _categoriesState$feat10, _curCategoryState$pag2, _featuredRes$content30, _featuredRes$content31, _featuredRes$content32, _featuredRes$content33, _featuredRes$content34, _featuredRes$content35, _categoriesState$feat11, _categoriesState$feat12, productsList, productsListFeatured, paginationData, _newcategoryState2, _isFeatured2, _err$constructor2, _err$message2;
+      var curCategoryState, _featuredRes$content20, _yield$getLazyProduct3, _yield$getLazyProduct4, lazyRes, featuredRes, _lazyRes$content2, error, result, pagination, errorsList, _featuredRes$content21, _featuredRes$content22, _featuredRes$content23, _featuredRes$content24, _featuredRes$content25, _featuredRes$content26, _featuredRes$content27, _featuredRes$content28, oldFeatured, featureState, _categoriesState$feat9, _categoriesState$feat10, newcategoryState, isFeatured, _ref10, _featuredRes$content$2, _featuredRes$content29, _categoriesState$feat11, _categoriesState$feat12, _curCategoryState$pag2, _featuredRes$content30, _featuredRes$content31, _featuredRes$content32, _featuredRes$content33, _featuredRes$content34, _featuredRes$content35, _categoriesState$feat13, _categoriesState$feat14, productsList, productsListFeatured, paginationData, _newcategoryState2, _isFeatured2, _err$constructor2, _err$message2;
 
       return _regeneratorRuntime().wrap(function _callee4$(_context4) {
         while (1) {
@@ -802,7 +859,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
                 setCategoriesState(_objectSpread({}, categoriesState));
                 isFeatured = categoriesState.all.products.some(function (product) {
                   return product.featured;
-                }) || (categoriesState === null || categoriesState === void 0 ? void 0 : (_categoriesState$feat7 = categoriesState.featured) === null || _categoriesState$feat7 === void 0 ? void 0 : (_categoriesState$feat8 = _categoriesState$feat7.products) === null || _categoriesState$feat8 === void 0 ? void 0 : _categoriesState$feat8.some(function (product) {
+                }) || (categoriesState === null || categoriesState === void 0 ? void 0 : (_categoriesState$feat9 = categoriesState.featured) === null || _categoriesState$feat9 === void 0 ? void 0 : (_categoriesState$feat10 = _categoriesState$feat9.products) === null || _categoriesState$feat10 === void 0 ? void 0 : _categoriesState$feat10.some(function (product) {
                   return product.featured;
                 }));
                 setFeaturedProducts(isFeatured);
@@ -815,7 +872,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
                   return item;
                 });
                 productsListFeatured = (_featuredRes$content$2 = featuredRes === null || featuredRes === void 0 ? void 0 : (_featuredRes$content29 = featuredRes.content) === null || _featuredRes$content29 === void 0 ? void 0 : _featuredRes$content29.result) !== null && _featuredRes$content$2 !== void 0 ? _featuredRes$content$2 : [];
-                paginationData = categorySelected.id === 'featured' ? (_categoriesState$feat9 = categoriesState === null || categoriesState === void 0 ? void 0 : (_categoriesState$feat10 = categoriesState.featured) === null || _categoriesState$feat10 === void 0 ? void 0 : _categoriesState$feat10.pagination) !== null && _categoriesState$feat9 !== void 0 ? _categoriesState$feat9 : {} : (_curCategoryState$pag2 = curCategoryState.pagination) !== null && _curCategoryState$pag2 !== void 0 ? _curCategoryState$pag2 : {};
+                paginationData = categorySelected.id === 'featured' ? (_categoriesState$feat11 = categoriesState === null || categoriesState === void 0 ? void 0 : (_categoriesState$feat12 = categoriesState.featured) === null || _categoriesState$feat12 === void 0 ? void 0 : _categoriesState$feat12.pagination) !== null && _categoriesState$feat11 !== void 0 ? _categoriesState$feat11 : {} : (_curCategoryState$pag2 = curCategoryState.pagination) !== null && _curCategoryState$pag2 !== void 0 ? _curCategoryState$pag2 : {};
                 _newcategoryState2 = {
                   pagination: _objectSpread(_objectSpread({}, paginationData), {}, {
                     currentPage: categorySelected.id === 'featured' ? featuredRes === null || featuredRes === void 0 ? void 0 : (_featuredRes$content30 = featuredRes.content) === null || _featuredRes$content30 === void 0 ? void 0 : (_featuredRes$content31 = _featuredRes$content30.pagination) === null || _featuredRes$content31 === void 0 ? void 0 : _featuredRes$content31.current_page : pagination.current_page,
@@ -831,7 +888,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
                 setCategoriesState(_objectSpread({}, categoriesState));
                 _isFeatured2 = categoriesState.all.products.some(function (product) {
                   return product.featured;
-                }) || (categoriesState === null || categoriesState === void 0 ? void 0 : (_categoriesState$feat11 = categoriesState.featured) === null || _categoriesState$feat11 === void 0 ? void 0 : (_categoriesState$feat12 = _categoriesState$feat11.products) === null || _categoriesState$feat12 === void 0 ? void 0 : _categoriesState$feat12.some(function (product) {
+                }) || (categoriesState === null || categoriesState === void 0 ? void 0 : (_categoriesState$feat13 = categoriesState.featured) === null || _categoriesState$feat13 === void 0 ? void 0 : (_categoriesState$feat14 = _categoriesState$feat13.products) === null || _categoriesState$feat14 === void 0 ? void 0 : _categoriesState$feat14.some(function (product) {
                   return product.featured;
                 }));
                 setFeaturedProducts(_isFeatured2);
@@ -939,7 +996,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
     if (isInitialRender) {
       getProduct();
     }
-  }, [JSON.stringify((_businessState$busine15 = businessState.business) === null || _businessState$busine15 === void 0 ? void 0 : _businessState$busine15.id), isInitialRender]);
+  }, [JSON.stringify((_businessState$busine17 = businessState.business) === null || _businessState$busine17 === void 0 ? void 0 : _businessState$busine17.id), isInitialRender]);
 
   var getBusiness = /*#__PURE__*/function () {
     var _ref12 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
@@ -977,13 +1034,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
             case 9:
               _yield$ordering$busin2 = _context6.sent;
               result = _yield$ordering$busin2.content.result;
-
-              if (!(result !== null && result !== void 0 && result.categories) || (result === null || result === void 0 ? void 0 : (_result$categories = result.categories) === null || _result$categories === void 0 ? void 0 : _result$categories.length) === 0) {
-                setErrorQuantityProducts(true);
-              } else {
-                setErrorQuantityProducts(false);
-              }
-
+              setErrorQuantityProducts(!(result !== null && result !== void 0 && result.categories) || (result === null || result === void 0 ? void 0 : (_result$categories = result.categories) === null || _result$categories === void 0 ? void 0 : _result$categories.length) === 0);
               data = _objectSpread(_objectSpread({}, businessState), {}, {
                 business: result,
                 loading: false
@@ -1183,7 +1234,8 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
     },
     multiRemoveProducts: multiRemoveProducts,
     setAlertState: setAlertState,
-    alertState: alertState
+    alertState: alertState,
+    handleUpdateProducts: handleUpdateProducts
   })));
 };
 
