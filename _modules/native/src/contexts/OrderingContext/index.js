@@ -68,7 +68,9 @@ var OrderingProvider = function OrderingProvider(_ref) {
     })
   }, /*#__PURE__*/_react.default.createElement(_LanguageContext.LanguageProvider, {
     strategy: nativeStrategy
-  }, /*#__PURE__*/_react.default.createElement(_ConfigContext.ConfigProvider, null, /*#__PURE__*/_react.default.createElement(_UtilsContext.UtilsProviders, null, /*#__PURE__*/_react.default.createElement(_ToastContext.ToastProvider, null, /*#__PURE__*/_react.default.createElement(_ValidationsFieldsContext.ValidationFieldsProvider, null, /*#__PURE__*/_react.default.createElement(_SessionContext.SessionProvider, {
+  }, /*#__PURE__*/_react.default.createElement(_ConfigContext.ConfigProvider, {
+    strategy: nativeStrategy
+  }, /*#__PURE__*/_react.default.createElement(_UtilsContext.UtilsProviders, null, /*#__PURE__*/_react.default.createElement(_ToastContext.ToastProvider, null, /*#__PURE__*/_react.default.createElement(_ValidationsFieldsContext.ValidationFieldsProvider, null, /*#__PURE__*/_react.default.createElement(_SessionContext.SessionProvider, {
     strategy: nativeStrategy
   }, /*#__PURE__*/_react.default.createElement(_WebsocketContext.WebsocketProvider, {
     strategy: nativeStrategy,
