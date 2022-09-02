@@ -156,10 +156,12 @@ var OrderProvider = function OrderProvider(_ref) {
     loading: true,
     options: isDisabledDefaultOpts ? {
       type: null,
-      moment: null
+      moment: null,
+      city_id: null
     } : {
       type: orderTypes[configState === null || configState === void 0 ? void 0 : (_configState$configs2 = configState.configs) === null || _configState$configs2 === void 0 ? void 0 : (_configState$configs3 = _configState$configs2.default_order_type) === null || _configState$configs3 === void 0 ? void 0 : _configState$configs3.value],
-      moment: null
+      moment: null,
+      city_id: null
     },
     carts: {},
     confirmAlert: confirmAlert,
@@ -1972,6 +1974,12 @@ var OrderProvider = function OrderProvider(_ref) {
     };
   }();
 
+  var changeCityFilter = function changeCityFilter(id) {
+    updateOrderOptions({
+      city_id: id
+    });
+  };
+
   var setOptionFromLocalStorage = /*#__PURE__*/function () {
     var _ref20 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee19() {
       var _configState$configs4, _configState$configs5, _state$options10;
@@ -1994,7 +2002,8 @@ var OrderProvider = function OrderProvider(_ref) {
                 } : {
                   type: (optionsLocalStorage === null || optionsLocalStorage === void 0 ? void 0 : optionsLocalStorage.type) || orderTypes[configState === null || configState === void 0 ? void 0 : (_configState$configs4 = configState.configs) === null || _configState$configs4 === void 0 ? void 0 : (_configState$configs5 = _configState$configs4.default_order_type) === null || _configState$configs5 === void 0 ? void 0 : _configState$configs5.value],
                   moment: (optionsLocalStorage === null || optionsLocalStorage === void 0 ? void 0 : optionsLocalStorage.moment) || null,
-                  address: (optionsLocalStorage === null || optionsLocalStorage === void 0 ? void 0 : optionsLocalStorage.address) || (state === null || state === void 0 ? void 0 : (_state$options10 = state.options) === null || _state$options10 === void 0 ? void 0 : _state$options10.address) || {}
+                  address: (optionsLocalStorage === null || optionsLocalStorage === void 0 ? void 0 : optionsLocalStorage.address) || (state === null || state === void 0 ? void 0 : (_state$options10 = state.options) === null || _state$options10 === void 0 ? void 0 : _state$options10.address) || {},
+                  city_id: (optionsLocalStorage === null || optionsLocalStorage === void 0 ? void 0 : optionsLocalStorage.city_id) || null
                 }
               }));
 
@@ -2186,7 +2195,8 @@ var OrderProvider = function OrderProvider(_ref) {
     changePaymethod: changePaymethod,
     setUserCustomerOptions: setUserCustomerOptions,
     setStateValues: setStateValues,
-    placeMulitCarts: placeMulitCarts
+    placeMulitCarts: placeMulitCarts,
+    changeCityFilter: changeCityFilter
   };
   var copyState = JSON.parse(JSON.stringify(state));
   return /*#__PURE__*/_react.default.createElement(OrderContext.Provider, {
