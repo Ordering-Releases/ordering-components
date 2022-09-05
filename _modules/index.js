@@ -489,6 +489,18 @@ Object.defineProperty(exports, "OrderingProvider", {
     return _OrderingContext.OrderingProvider;
   }
 });
+Object.defineProperty(exports, "OrderingThemeContext", {
+  enumerable: true,
+  get: function get() {
+    return _OrderingThemeContext.OrderingThemeContext;
+  }
+});
+Object.defineProperty(exports, "OrderingThemeProvider", {
+  enumerable: true,
+  get: function get() {
+    return _OrderingThemeContext.OrderingThemeProvider;
+  }
+});
 Object.defineProperty(exports, "OrdersControlFilters", {
   enumerable: true,
   get: function get() {
@@ -861,6 +873,12 @@ Object.defineProperty(exports, "useOrder", {
     return _OrderContext.useOrder;
   }
 });
+Object.defineProperty(exports, "useOrderingTheme", {
+  enumerable: true,
+  get: function get() {
+    return _OrderingThemeContext.useOrderingTheme;
+  }
+});
 Object.defineProperty(exports, "useSession", {
   enumerable: true,
   get: function get() {
@@ -1091,6 +1109,8 @@ var _CustomerContext = require("./contexts/CustomerContext");
 var _ValidationsFieldsContext = require("./contexts/ValidationsFieldsContext");
 
 var _ToastContext = require("./contexts/ToastContext");
+
+var _OrderingThemeContext = require("./contexts/OrderingThemeContext");
 
 var _PlaceSpot = require("./components/PlaceSpot");
 

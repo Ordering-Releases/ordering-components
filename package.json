@@ -1,6 +1,6 @@
 {
   "name": "ordering-components-external",
-  "version": "0.1.2",
+  "version": "1.0.1",
   "description": "Ordering Internal Dashboard",
   "main": "./_modules/index.js",
   "scripts": {
