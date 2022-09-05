@@ -19,7 +19,8 @@ export const UserFormDetails = (props) => {
     useValidationFields,
     handleButtonUpdateClick,
     handleSuccessUpdate,
-    isCustomerMode
+    isCustomerMode,
+    isSuccess
   } = props
 
   const [ordering] = useApi()
@@ -30,11 +31,9 @@ export const UserFormDetails = (props) => {
   const [userState, setUserState] = useState({ loading: false, loadingDriver: false, result: { error: false } })
   const [formState, setFormState] = useState({ loading: false, changes: {}, result: { error: false } })
   const [verifyPhoneState, setVerifyPhoneState] = useState({ loading: false, result: { error: false } })
-  const [checkPhoneCodeState, setCheckPhoneCodeState] = useState({ loading: false, result: { error: false } })
   const [removeAccountState, setAccountState] = useState({ loading: false, error: null, result: null })
 
   const requestsState = {}
-
   const accessToken = useDefualtSessionManager ? session.token : props.accessToken
 
   useEffect(() => {
@@ -83,7 +82,7 @@ export const UserFormDetails = (props) => {
         requestsState.user.cancel()
       }
     }
-  }, [session.loading])
+  }, [session.loading, isSuccess])
 
   /**
    * Clean formState
@@ -280,6 +279,39 @@ export const UserFormDetails = (props) => {
     }
   }
 
+  /**
+   * function to send verify code with twilio
+   * @param {Object} values object with cellphone and country code values
+   */
+  const sendVerifyPhoneCode = async (values) => {
+    const body = {
+      cellphone: values.cellphone,
+      country_phone_code: parseInt(values.country_phone_code)
+    }
+    try {
+      setVerifyPhoneState({ ...verifyPhoneState, loading: true })
+      const response = await fetch(`${ordering.root}/auth/sms/twilio/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      const res = await response.json()
+      setVerifyPhoneState({
+        ...verifyPhoneState,
+        loading: false,
+        result: res
+      })
+    } catch (error) {
+      setVerifyPhoneState({
+        ...verifyPhoneState,
+        loading: false,
+        result: {
+          error: error.message
+        }
+      })
+    }
+  }
+
   const handleChangePromotions = (enabled) => {
     setFormState({
       ...formState,
@@ -336,6 +368,8 @@ export const UserFormDetails = (props) => {
           handlechangeImage={handlechangeImage}
           toggleIsEdit={() => setIsEdit(!isEdit)}
           handleToggleAvalaibleStatusDriver={handleToggleAvalaibleStatusDriver}
+          handleSendVerifyCode={sendVerifyPhoneCode}
+          verifyPhoneState={verifyPhoneState}
           handleChangePromotions={handleChangePromotions}
           handleRemoveAccount={handleRemoveAccount}
         />

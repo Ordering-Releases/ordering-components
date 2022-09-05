@@ -1,6 +1,6 @@
 {
   "name": "ordering-components-external",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Ordering Internal Dashboard",
   "main": "./_modules/index.js",
   "scripts": {
@@ -51,6 +51,8 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.10.4",
+    "@sentry/react": "^5.27.1",
+    "@sentry/tracing": "^5.27.1",
     "@react-native-async-storage/async-storage": "^1.13.1",
     "@segment/analytics-next": "^1.35.1",
     "@stripe/react-stripe-js": "^1.1.2",

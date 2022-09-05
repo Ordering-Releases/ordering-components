@@ -70,7 +70,8 @@ var UserFormDetails = function UserFormDetails(props) {
       useValidationFields = props.useValidationFields,
       handleButtonUpdateClick = props.handleButtonUpdateClick,
       handleSuccessUpdate = props.handleSuccessUpdate,
-      isCustomerMode = props.isCustomerMode;
+      isCustomerMode = props.isCustomerMode,
+      isSuccess = props.isSuccess;
 
   var _useApi = (0, _ApiContext.useApi)(),
       _useApi2 = _slicedToArray(_useApi, 1),
@@ -129,22 +130,12 @@ var UserFormDetails = function UserFormDetails(props) {
 
   var _useState9 = (0, _react.useState)({
     loading: false,
-    result: {
-      error: false
-    }
-  }),
-      _useState10 = _slicedToArray(_useState9, 2),
-      checkPhoneCodeState = _useState10[0],
-      setCheckPhoneCodeState = _useState10[1];
-
-  var _useState11 = (0, _react.useState)({
-    loading: false,
     error: null,
     result: null
   }),
-      _useState12 = _slicedToArray(_useState11, 2),
-      removeAccountState = _useState12[0],
-      setAccountState = _useState12[1];
+      _useState10 = _slicedToArray(_useState9, 2),
+      removeAccountState = _useState10[0],
+      setAccountState = _useState10[1];
 
   var requestsState = {};
   var accessToken = useDefualtSessionManager ? session.token : props.accessToken;
@@ -196,7 +187,7 @@ var UserFormDetails = function UserFormDetails(props) {
         requestsState.user.cancel();
       }
     };
-  }, [session.loading]);
+  }, [session.loading, isSuccess]);
   /**
    * Clean formState
    */
@@ -452,6 +443,72 @@ var UserFormDetails = function UserFormDetails(props) {
       return _ref2.apply(this, arguments);
     };
   }();
+  /**
+   * function to send verify code with twilio
+   * @param {Object} values object with cellphone and country code values
+   */
+
+
+  var sendVerifyPhoneCode = /*#__PURE__*/function () {
+    var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(values) {
+      var body, response, res;
+      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              body = {
+                cellphone: values.cellphone,
+                country_phone_code: parseInt(values.country_phone_code)
+              };
+              _context3.prev = 1;
+              setVerifyPhoneState(_objectSpread(_objectSpread({}, verifyPhoneState), {}, {
+                loading: true
+              }));
+              _context3.next = 5;
+              return fetch("".concat(ordering.root, "/auth/sms/twilio/verify"), {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+              });
+
+            case 5:
+              response = _context3.sent;
+              _context3.next = 8;
+              return response.json();
+
+            case 8:
+              res = _context3.sent;
+              setVerifyPhoneState(_objectSpread(_objectSpread({}, verifyPhoneState), {}, {
+                loading: false,
+                result: res
+              }));
+              _context3.next = 15;
+              break;
+
+            case 12:
+              _context3.prev = 12;
+              _context3.t0 = _context3["catch"](1);
+              setVerifyPhoneState(_objectSpread(_objectSpread({}, verifyPhoneState), {}, {
+                loading: false,
+                result: {
+                  error: _context3.t0.message
+                }
+              }));
+
+            case 15:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, _callee3, null, [[1, 12]]);
+    }));
+
+    return function sendVerifyPhoneCode(_x5) {
+      return _ref3.apply(this, arguments);
+    };
+  }();
 
   var handleChangePromotions = function handleChangePromotions(enabled) {
     setFormState(_objectSpread(_objectSpread({}, formState), {}, {
@@ -471,18 +528,18 @@ var UserFormDetails = function UserFormDetails(props) {
   };
 
   var handleRemoveAccount = /*#__PURE__*/function () {
-    var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(userId) {
+    var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(userId) {
       var idToDelete, response, res;
-      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+      return _regeneratorRuntime().wrap(function _callee4$(_context4) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
               idToDelete = userId !== null && userId !== void 0 ? userId : session.user.id;
-              _context3.prev = 1;
+              _context4.prev = 1;
               setAccountState(_objectSpread(_objectSpread({}, removeAccountState), {}, {
                 loading: true
               }));
-              _context3.next = 5;
+              _context4.next = 5;
               return fetch("".concat(ordering.root, "/users/").concat(idToDelete), {
                 method: 'DELETE',
                 headers: {
@@ -492,38 +549,38 @@ var UserFormDetails = function UserFormDetails(props) {
               });
 
             case 5:
-              response = _context3.sent;
-              _context3.next = 8;
+              response = _context4.sent;
+              _context4.next = 8;
               return response.json();
 
             case 8:
-              res = _context3.sent;
+              res = _context4.sent;
               setAccountState(_objectSpread(_objectSpread({}, removeAccountState), {}, {
                 loading: false,
                 result: res === null || res === void 0 ? void 0 : res.result,
                 error: res === null || res === void 0 ? void 0 : res.error
               }));
-              _context3.next = 15;
+              _context4.next = 15;
               break;
 
             case 12:
-              _context3.prev = 12;
-              _context3.t0 = _context3["catch"](1);
+              _context4.prev = 12;
+              _context4.t0 = _context4["catch"](1);
               setAccountState(_objectSpread(_objectSpread({}, removeAccountState), {}, {
                 loading: false,
-                error: _context3.t0.message
+                error: _context4.t0.message
               }));
 
             case 15:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
         }
-      }, _callee3, null, [[1, 12]]);
+      }, _callee4, null, [[1, 12]]);
     }));
 
-    return function handleRemoveAccount(_x5) {
-      return _ref3.apply(this, arguments);
+    return function handleRemoveAccount(_x6) {
+      return _ref4.apply(this, arguments);
     };
   }();
 
@@ -544,6 +601,8 @@ var UserFormDetails = function UserFormDetails(props) {
       return setIsEdit(!isEdit);
     },
     handleToggleAvalaibleStatusDriver: handleToggleAvalaibleStatusDriver,
+    handleSendVerifyCode: sendVerifyPhoneCode,
+    verifyPhoneState: verifyPhoneState,
     handleChangePromotions: handleChangePromotions,
     handleRemoveAccount: handleRemoveAccount
   })));

@@ -124,46 +124,51 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
       filterByMenus = _useState10[0],
       setFilterByMenus = _useState10[1];
 
-  var _useState11 = (0, _react.useState)({
+  var _useState11 = (0, _react.useState)(null),
+      _useState12 = _slicedToArray(_useState11, 2),
+      professionalSelected = _useState12[0],
+      setProfessionalSelected = _useState12[1];
+
+  var _useState13 = (0, _react.useState)({
     business: {},
     menus: null,
     loading: !props.avoidBusinessLoading,
     error: null
   }),
-      _useState12 = _slicedToArray(_useState11, 2),
-      businessState = _useState12[0],
-      setBusinessState = _useState12[1];
-
-  var _useState13 = (0, _react.useState)({}),
       _useState14 = _slicedToArray(_useState13, 2),
-      categoriesState = _useState14[0],
-      setCategoriesState = _useState14[1];
+      businessState = _useState14[0],
+      setBusinessState = _useState14[1];
 
   var _useState15 = (0, _react.useState)({}),
       _useState16 = _slicedToArray(_useState15, 2),
-      orderOptions = _useState16[0],
-      setOrderOptions = _useState16[1];
+      categoriesState = _useState16[0],
+      setCategoriesState = _useState16[1];
 
-  var _useState17 = (0, _react.useState)({
+  var _useState17 = (0, _react.useState)({}),
+      _useState18 = _slicedToArray(_useState17, 2),
+      orderOptions = _useState18[0],
+      setOrderOptions = _useState18[1];
+
+  var _useState19 = (0, _react.useState)({
     product: null,
     loading: false,
     error: null
   }),
-      _useState18 = _slicedToArray(_useState17, 2),
-      productModal = _useState18[0],
-      setProductModal = _useState18[1];
-
-  var _useState19 = (0, _react.useState)(false),
       _useState20 = _slicedToArray(_useState19, 2),
-      featuredProducts = _useState20[0],
-      setFeaturedProducts = _useState20[1];
+      productModal = _useState20[0],
+      setProductModal = _useState20[1];
 
-  var _useState21 = (0, _react.useState)({
+  var _useState21 = (0, _react.useState)(false),
+      _useState22 = _slicedToArray(_useState21, 2),
+      featuredProducts = _useState22[0],
+      setFeaturedProducts = _useState22[1];
+
+  var _useState23 = (0, _react.useState)({
     values: []
   }),
-      _useState22 = _slicedToArray(_useState21, 2),
-      openCategories = _useState22[0],
-      setOpenCategories = _useState22[1];
+      _useState24 = _slicedToArray(_useState23, 2),
+      openCategories = _useState24[0],
+      setOpenCategories = _useState24[1];
 
   var requestsState = {};
   var categoryStateDefault = {
@@ -178,20 +183,20 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
     products: []
   };
 
-  var _useState23 = (0, _react.useState)(categoryStateDefault),
-      _useState24 = _slicedToArray(_useState23, 2),
-      categoryState = _useState24[0],
-      setCategoryState = _useState24[1];
-
-  var _useState25 = (0, _react.useState)(null),
+  var _useState25 = (0, _react.useState)(categoryStateDefault),
       _useState26 = _slicedToArray(_useState25, 2),
-      errors = _useState26[0],
-      setErrors = _useState26[1];
+      categoryState = _useState26[0],
+      setCategoryState = _useState26[1];
 
-  var _useState27 = (0, _react.useState)(false),
+  var _useState27 = (0, _react.useState)(null),
       _useState28 = _slicedToArray(_useState27, 2),
-      errorQuantityProducts = _useState28[0],
-      setErrorQuantityProducts = _useState28[1];
+      errors = _useState28[0],
+      setErrors = _useState28[1];
+
+  var _useState29 = (0, _react.useState)(false),
+      _useState30 = _slicedToArray(_useState29, 2),
+      errorQuantityProducts = _useState30[0],
+      setErrorQuantityProducts = _useState30[1];
 
   var categoryKey = searchValue ? 'search' : categorySelected.id === 'featured' ? 'featured' : categorySelected.id ? "categoryId:".concat(categorySelected.id) : 'all';
   var isUseParentCategory = (configs === null || configs === void 0 ? void 0 : (_configs$use_parent_c = configs.use_parent_category) === null || _configs$use_parent_c === void 0 ? void 0 : _configs$use_parent_c.value) === 'true' || (configs === null || configs === void 0 ? void 0 : (_configs$use_parent_c2 = configs.use_parent_category) === null || _configs$use_parent_c2 === void 0 ? void 0 : _configs$use_parent_c2.value) === '1';
@@ -204,7 +209,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
     var _category$subcategori;
 
     if (category !== null && category !== void 0 && (_category$subcategori = category.subcategories) !== null && _category$subcategori !== void 0 && _category$subcategori.length) {
-      if (!(category !== null && category !== void 0 && category.parent_category_id)) {
+      if (!(category !== null && category !== void 0 && category.parent_category_id) && !openCategories.values.includes(category.id)) {
         openCategories.values = [];
       }
 
@@ -289,6 +294,15 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
       subCategoriesList.push(category);
       iterateCategories(category.subcategories);
     }));
+  };
+  /**
+   * Method to change professional
+   * @param {object} professional a professional info
+   */
+
+
+  var handleChangeProfessionalSelected = function handleChangeProfessionalSelected(professional) {
+    setProfessionalSelected(professional);
   };
 
   var handleUpdateProducts = function handleUpdateProducts(productId, changes) {
@@ -439,9 +453,9 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
 
   var getLazyProducts = /*#__PURE__*/function () {
     var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(_ref4) {
-      var _orderState$options$t, _orderState$options, _orderState$options2, _orderState$options3, _where, _where$conditions;
+      var _orderState$options$t, _orderState$options, _orderState$options2, _orderState$options3, _where, _where$conditions, _where2, _where2$conditions;
 
-      var page, _ref4$pageSize, pageSize, parameters, _orderState$options4, moment, where, searchConditions, source, promises, functionFetch, productEndpoint, _where2, _where2$conditions;
+      var page, _ref4$pageSize, pageSize, parameters, _orderState$options4, moment, where, searchConditions, source, promises, functionFetch, productEndpoint, _where3, _where3$conditions;
 
       return _regeneratorRuntime().wrap(function _callee2$(_context2) {
         while (1) {
@@ -511,8 +525,8 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
               source = {};
               requestsState.products = source;
               promises = [];
-              functionFetch = categorySelected.id && categorySelected.id !== 'featured' ? ordering.businesses(businessState.business.id).categories(categorySelected.id).products() : !isUseParentCategory ? ordering.businesses(businessState.business.id).products() : ordering.businesses(businessState.business.id).categories();
-              productEndpoint = ((_where = where) === null || _where === void 0 ? void 0 : (_where$conditions = _where.conditions) === null || _where$conditions === void 0 ? void 0 : _where$conditions.length) > 0 ? functionFetch.parameters(parameters).where(where) : functionFetch.parameters(parameters);
+              functionFetch = categorySelected.id && categorySelected.id !== 'featured' ? ordering.businesses(businessState.business.id).categories(categorySelected.id).products() : !isUseParentCategory ? ordering.businesses(businessState.business.id).products() : !(((_where = where) === null || _where === void 0 ? void 0 : (_where$conditions = _where.conditions) === null || _where$conditions === void 0 ? void 0 : _where$conditions.length) > 0) ? ordering.businesses(businessState.business.id).categories() : ordering.businesses(businessState.business.id).products();
+              productEndpoint = ((_where2 = where) === null || _where2 === void 0 ? void 0 : (_where2$conditions = _where2.conditions) === null || _where2$conditions === void 0 ? void 0 : _where2$conditions.length) > 0 ? functionFetch.parameters(parameters).where(where) : functionFetch.parameters(parameters);
               _context2.t0 = promises;
               _context2.next = 18;
               return productEndpoint.get({
@@ -530,7 +544,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
               }
 
               parameters.params = 'features';
-              productEndpoint = ((_where2 = where) === null || _where2 === void 0 ? void 0 : (_where2$conditions = _where2.conditions) === null || _where2$conditions === void 0 ? void 0 : _where2$conditions.length) > 0 ? ordering.businesses(businessState.business.id).products().parameters(parameters).where(where) : ordering.businesses(businessState.business.id).products().parameters(parameters);
+              productEndpoint = ((_where3 = where) === null || _where3 === void 0 ? void 0 : (_where3$conditions = _where3.conditions) === null || _where3$conditions === void 0 ? void 0 : _where3$conditions.length) > 0 ? ordering.businesses(businessState.business.id).products().parameters(parameters).where(where) : ordering.businesses(businessState.business.id).products().parameters(parameters);
               _context2.t2 = promises;
               _context2.next = 26;
               return productEndpoint.get({
@@ -727,7 +741,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
               }
 
               if (isUseParentCategory && (!categorySelected.id || categorySelected.id === 'featured')) {
-                productsList = (_ref8 = []).concat.apply(_ref8, _toConsumableArray(result.map(function (category) {
+                productsList = searchValue ? _toConsumableArray(result) : (_ref8 = []).concat.apply(_ref8, _toConsumableArray(result.map(function (category) {
                   return category === null || category === void 0 ? void 0 : category.products;
                 }))).filter(function (item) {
                   return item;
@@ -741,7 +755,7 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
                     totalPages: categorySelected.id === 'featured' ? featuredRes === null || featuredRes === void 0 ? void 0 : (_featuredRes$content18 = featuredRes.content) === null || _featuredRes$content18 === void 0 ? void 0 : (_featuredRes$content19 = _featuredRes$content18.pagination) === null || _featuredRes$content19 === void 0 ? void 0 : _featuredRes$content19.total_pages : pagination.total_pages
                   }),
                   loading: false,
-                  products: categorySelected.id === 'featured' ? productsListFeatured : [].concat(_toConsumableArray(productsListFeatured), _toConsumableArray(curCategoryState.products.concat(productsList)))
+                  products: categorySelected.id === 'featured' ? productsListFeatured : searchValue ? [].concat(_toConsumableArray(productsListFeatured), _toConsumableArray(productsList)) : [].concat(_toConsumableArray(productsListFeatured), _toConsumableArray(curCategoryState.products.concat(productsList)))
                 };
                 categoriesState[categoryKey] = _newcategoryState;
                 setCategoryState(_objectSpread({}, _newcategoryState));
@@ -1026,12 +1040,16 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
                 parameters.menu_id = filterByMenus;
               }
 
-              _context6.next = 9;
+              if (professionalSelected) {
+                parameters.professional_id = professionalSelected === null || professionalSelected === void 0 ? void 0 : professionalSelected.id;
+              }
+
+              _context6.next = 10;
               return ordering.businesses(slug).select(businessProps).parameters(parameters).get({
                 cancelToken: source
               });
 
-            case 9:
+            case 10:
               _yield$ordering$busin2 = _context6.sent;
               result = _yield$ordering$busin2.content.result;
               setErrorQuantityProducts(!(result !== null && result !== void 0 && result.categories) || (result === null || result === void 0 ? void 0 : (_result$categories = result.categories) === null || _result$categories === void 0 ? void 0 : _result$categories.length) === 0);
@@ -1041,37 +1059,37 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
               });
 
               if (!(menusProps && isGetMenus)) {
-                _context6.next = 19;
+                _context6.next = 20;
                 break;
               }
 
-              _context6.next = 16;
+              _context6.next = 17;
               return ordering.businesses(result.id).menus().select(menusProps).get();
 
-            case 16:
+            case 17:
               _yield$ordering$busin3 = _context6.sent;
               menus = _yield$ordering$busin3.content.result;
               data.menus = menus;
 
-            case 19:
+            case 20:
               setBusinessState(data);
-              _context6.next = 25;
+              _context6.next = 26;
               break;
 
-            case 22:
-              _context6.prev = 22;
+            case 23:
+              _context6.prev = 23;
               _context6.t0 = _context6["catch"](0);
               setBusinessState(_objectSpread(_objectSpread({}, businessState), {}, {
                 loading: false,
                 error: [_context6.t0.message]
               }));
 
-            case 25:
+            case 26:
             case "end":
               return _context6.stop();
           }
         }
-      }, _callee6, null, [[0, 22]]);
+      }, _callee6, null, [[0, 23]]);
     }));
 
     return function getBusiness() {
@@ -1150,12 +1168,12 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
     if (!orderState.loading && orderOptions && !languageState.loading && !props.avoidBusinessLoading) {
       getBusiness();
     }
-  }, [orderOptions, languageState.loading, slug, filterByMenus]);
+  }, [orderOptions, languageState.loading, slug, filterByMenus, professionalSelected]);
   (0, _react.useEffect)(function () {
     if (!orderState.loading && orderOptions && !languageState.loading && !businessState.loading && props.avoidBusinessLoading) {
       getBusiness();
     }
-  }, [orderOptions, languageState.loading, slug, filterByMenus]);
+  }, [orderOptions, languageState.loading, slug, filterByMenus, professionalSelected]);
   /**
    * getBusiness if orderState is loading the first time when is rendered
    */
@@ -1235,7 +1253,9 @@ var BusinessAndProductList = function BusinessAndProductList(props) {
     multiRemoveProducts: multiRemoveProducts,
     setAlertState: setAlertState,
     alertState: alertState,
-    handleUpdateProducts: handleUpdateProducts
+    handleUpdateProducts: handleUpdateProducts,
+    professionalSelected: professionalSelected,
+    handleChangeProfessionalSelected: handleChangeProfessionalSelected
   })));
 };
 

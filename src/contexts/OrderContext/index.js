@@ -352,8 +352,9 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
    * @param {object} product product for add
    * @param {object} cart cart of the product
    * @param {boolean} isQuickAddProduct option to add product when clicks
+   * @param {boolean} isService option to add product when product type is service
    */
-  const addProduct = async (product, cart, isQuickAddProduct) => {
+  const addProduct = async (product, cart, isQuickAddProduct, isService) => {
     try {
       setState({ ...state, loading: true })
       const customerFromLocalStorage = await strategy.getItem('user-customer', true)
@@ -361,7 +362,9 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
       const body = {
         product,
         business_id: cart.business_id,
-        user_id: userCustomerId || session.user.id
+        user_id: userCustomerId || session.user.id,
+        ...(isService && { professional_id: cart?.professional_id }),
+        ...(isService && { service_start: cart?.service_start })
       }
       const { content: { error, result } } = await ordering.setAccessToken(session.token).carts().addProduct(body, { headers: { 'X-Socket-Id-X': socket?.getId() } })
       if (!error) {
@@ -444,7 +447,7 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
   /**
    * Update product to cart
    */
-  const updateProduct = async (product, cart, isQuickAddProduct) => {
+  const updateProduct = async (product, cart, isQuickAddProduct, isService) => {
     try {
       setState({ ...state, loading: true })
       const customerFromLocalStorage = await strategy.getItem('user-customer', true)
@@ -452,7 +455,9 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
       const body = {
         product,
         business_id: cart.business_id,
-        user_id: userCustomerId || session.user.id
+        user_id: userCustomerId || session.user.id,
+        ...(isService && { professional_id: cart?.professional_id }),
+        ...(isService && { service_start: cart?.service_start })
       }
       const { content: { error, result } } = await ordering.setAccessToken(session.token).carts().updateProduct(body, { headers: { 'X-Socket-Id-X': socket?.getId() } })
       if (!error) {
@@ -865,6 +870,33 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
     })
   }
 
+  /**
+  * get Latest past Order that has no review
+  */
+  const getLastOrderHasNoReview = async () => {
+    if (session?.token) {
+      const pastOrderTypes = [1, 2, 5, 6, 10, 11, 12, 15, 16, 17]
+      const options = {
+        query: {
+          orderBy: '-delivery_datetime',
+          page: 1,
+          page_size: 10,
+          where: [{ attribute: 'status', value: pastOrderTypes }]
+        }
+      }
+      const { content: { result, error } } = await ordering.setAccessToken(session?.token).orders().get(options)
+
+      if (!error && result?.length > 0) {
+        const _noRviewOrder = result?.find(order => !order?.review)
+        return _noRviewOrder
+      } else {
+        return null
+      }
+    } else {
+      return null
+    }
+  }
+
   const setStateValues = (values) => {
     setState({ ...state, ...values })
   }
@@ -994,6 +1026,7 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
     setUserCustomerOptions,
     setStateValues,
     placeMulitCarts,
+    getLastOrderHasNoReview,
     changeCityFilter
   }
 
@@ -1045,7 +1078,8 @@ export const useOrder = () => {
     changeDriverTip: warningMessage,
     reorder: warningMessage,
     changePaymethod: warningMessage,
-    setStateValues: warningMessage
+    setStateValues: warningMessage,
+    getLastOrderHasNoReview: warningMessage
   }
   return orderManager || [{}, functionsPlaceholders]
 }

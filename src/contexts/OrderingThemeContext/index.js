@@ -13,6 +13,7 @@ export const OrderingThemeContext = createContext()
  * @param {props} props
  */
 export const OrderingThemeProvider = ({ children, settings }) => {
+
   const [state, setState] = useState({
     loading: true,
     theme: {},

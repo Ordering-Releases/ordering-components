@@ -32,6 +32,7 @@ export const BusinessAndProductList = (props) => {
   const [searchValue, setSearchValue] = useState(null)
   const [sortByValue, setSortByValue] = useState(null)
   const [filterByMenus, setFilterByMenus] = useState(null)
+  const [professionalSelected, setProfessionalSelected] = useState(null)
   const [businessState, setBusinessState] = useState({ business: {}, menus: null, loading: !props.avoidBusinessLoading, error: null })
   const [categoriesState, setCategoriesState] = useState({})
   const [orderOptions, setOrderOptions] = useState({})
@@ -67,7 +68,7 @@ export const BusinessAndProductList = (props) => {
    */
   const handleChangeCategory = (category) => {
     if (category?.subcategories?.length) {
-      if (!category?.parent_category_id) {
+      if (!category?.parent_category_id && !openCategories.values.includes(category.id)) {
         openCategories.values = []
       }
       if (openCategories.values.includes(category.id)) {
@@ -151,6 +152,14 @@ export const BusinessAndProductList = (props) => {
         iterateCategories(category.subcategories)
       })
     )
+  }
+
+  /**
+   * Method to change professional
+   * @param {object} professional a professional info
+   */
+  const handleChangeProfessionalSelected = (professional) => {
+    setProfessionalSelected(professional)
   }
 
   const handleUpdateProducts = (productId, changes) => {
@@ -330,7 +339,7 @@ export const BusinessAndProductList = (props) => {
       ? ordering.businesses(businessState.business.id).categories(categorySelected.id).products()
       : !isUseParentCategory
         ? ordering.businesses(businessState.business.id).products()
-        : ordering.businesses(businessState.business.id).categories()
+        : !(where?.conditions?.length > 0) ? ordering.businesses(businessState.business.id).categories() : ordering.businesses(businessState.business.id).products()
 
     let productEndpoint = where?.conditions?.length > 0
       ? functionFetch.parameters(parameters).where(where)
@@ -432,7 +441,7 @@ export const BusinessAndProductList = (props) => {
       }
 
       if (isUseParentCategory && (!categorySelected.id || categorySelected.id === 'featured')) {
-        const productsList = [].concat(...result.map(category => category?.products)).filter(item => item)
+        const productsList = searchValue ? [...result] : [].concat(...result.map(category => category?.products)).filter(item => item)
         const productsListFeatured = featuredRes?.content?.result ?? []
         const paginationData = categorySelected.id === 'featured'
           ? categoriesState?.featured?.pagination ?? {}
@@ -453,7 +462,7 @@ export const BusinessAndProductList = (props) => {
           loading: false,
           products: categorySelected.id === 'featured'
             ? productsListFeatured
-            : [...productsListFeatured, ...curCategoryState.products.concat(productsList)]
+            : searchValue ? [...productsListFeatured, ...productsList] : [...productsListFeatured, ...curCategoryState.products.concat(productsList)]
         }
 
         categoriesState[categoryKey] = newcategoryState
@@ -647,6 +656,10 @@ export const BusinessAndProductList = (props) => {
         parameters.menu_id = filterByMenus
       }
 
+      if (professionalSelected) {
+        parameters.professional_id = professionalSelected?.id
+      }
+
       const { content: { result } } = await ordering
         .businesses(slug)
         .select(businessProps)
@@ -717,13 +730,13 @@ export const BusinessAndProductList = (props) => {
     if (!orderState.loading && orderOptions && !languageState.loading && !props.avoidBusinessLoading) {
       getBusiness()
     }
-  }, [orderOptions, languageState.loading, slug, filterByMenus])
+  }, [orderOptions, languageState.loading, slug, filterByMenus, professionalSelected])
 
   useEffect(() => {
     if (!orderState.loading && orderOptions && !languageState.loading && !businessState.loading && props.avoidBusinessLoading) {
       getBusiness()
     }
-  }, [orderOptions, languageState.loading, slug, filterByMenus])
+  }, [orderOptions, languageState.loading, slug, filterByMenus, professionalSelected])
 
   /**
    * getBusiness if orderState is loading the first time when is rendered
@@ -800,6 +813,8 @@ export const BusinessAndProductList = (props) => {
           setAlertState={setAlertState}
           alertState={alertState}
           handleUpdateProducts={handleUpdateProducts}
+          professionalSelected={professionalSelected}
+          handleChangeProfessionalSelected={handleChangeProfessionalSelected}
         />
       )}
     </>
