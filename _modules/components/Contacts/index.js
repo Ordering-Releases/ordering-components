@@ -550,7 +550,8 @@ var Contacts = function Contacts(props) {
     getBusinesses: getBusinesses,
     getCustomers: getCustomers,
     getDrivers: getDrivers,
-    loadMore: loadMore
+    loadMore: loadMore,
+    getOrders: getOrders
   })));
 };
 exports.Contacts = Contacts;
