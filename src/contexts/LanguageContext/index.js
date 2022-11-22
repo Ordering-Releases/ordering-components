@@ -58,7 +58,9 @@ export const LanguageProvider = ({ children, strategy }) => {
           language
         })
       }
-    } catch (err) {}
+    } catch (err) {
+      setState({ ...state, loading: false })
+    }
   }
 
   const setLanguage = async (language) => {

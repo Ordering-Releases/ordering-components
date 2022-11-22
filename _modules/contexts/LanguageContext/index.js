@@ -157,12 +157,15 @@ var LanguageProvider = function LanguageProvider(_ref) {
                 language: language
               }));
             case 12:
-              _context3.next = 16;
+              _context3.next = 17;
               break;
             case 14:
               _context3.prev = 14;
               _context3.t0 = _context3["catch"](0);
-            case 16:
+              setState(_objectSpread(_objectSpread({}, state), {}, {
+                loading: false
+              }));
+            case 17:
             case "end":
               return _context3.stop();
           }
