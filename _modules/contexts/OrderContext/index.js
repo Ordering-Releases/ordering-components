@@ -337,64 +337,81 @@ var OrderProvider = function OrderProvider(_ref) {
    */
   var changeAddress = /*#__PURE__*/function () {
     var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(addressId, params) {
-      var optionsStorage, options, _state$options8, _params$address;
+      var _state$options8, _state$options8$addre;
+      var isCountryCodeChanged, optionsStorage, options, _state$options9, _params$address;
       return _regeneratorRuntime().wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
+              isCountryCodeChanged = ((_state$options8 = state.options) === null || _state$options8 === void 0 ? void 0 : (_state$options8$addre = _state$options8.address) === null || _state$options8$addre === void 0 ? void 0 : _state$options8$addre.country_code) !== (params === null || params === void 0 ? void 0 : params.country_code);
               if (!(_typeof(addressId) === 'object')) {
-                _context2.next = 10;
+                _context2.next = 11;
                 break;
               }
-              _context2.next = 3;
+              _context2.next = 4;
               return strategy.getItem('options', true);
-            case 3:
+            case 4:
               optionsStorage = _context2.sent;
               options = _objectSpread(_objectSpread(_objectSpread({}, state.options), optionsStorage), {}, {
                 address: _objectSpread(_objectSpread({}, optionsStorage === null || optionsStorage === void 0 ? void 0 : optionsStorage.address), addressId)
               });
               if (!session.auth) {
-                options.type = state === null || state === void 0 ? void 0 : (_state$options8 = state.options) === null || _state$options8 === void 0 ? void 0 : _state$options8.type;
+                options.type = state === null || state === void 0 ? void 0 : (_state$options9 = state.options) === null || _state$options9 === void 0 ? void 0 : _state$options9.type;
               }
-              _context2.next = 8;
+              _context2.next = 9;
               return strategy.setItem('options', options, true);
-            case 8:
+            case 9:
               setState(_objectSpread(_objectSpread({}, state), {}, {
                 options: options
               }));
               return _context2.abrupt("return");
-            case 10:
+            case 11:
               if (!(params && params !== null && params !== void 0 && params.address && !checkAddress(params === null || params === void 0 ? void 0 : params.address))) {
-                _context2.next = 13;
-                break;
-              }
-              updateOrderOptions({
-                address_id: params === null || params === void 0 ? void 0 : (_params$address = params.address) === null || _params$address === void 0 ? void 0 : _params$address.id,
-                country_code: params === null || params === void 0 ? void 0 : params.country_code
-              });
-              return _context2.abrupt("return");
-            case 13:
-              if (!(params && params !== null && params !== void 0 && params.isEdit)) {
-                _context2.next = 18;
-                break;
-              }
-              if (!(addressId !== state.options.address_id)) {
                 _context2.next = 16;
                 break;
               }
+              _context2.next = 14;
+              return updateOrderOptions({
+                address_id: params === null || params === void 0 ? void 0 : (_params$address = params.address) === null || _params$address === void 0 ? void 0 : _params$address.id,
+                country_code: params === null || params === void 0 ? void 0 : params.country_code
+              });
+            case 14:
+              if (isCountryCodeChanged) {
+                events.emit('country_code_changed', params === null || params === void 0 ? void 0 : params.country_code);
+              }
               return _context2.abrupt("return");
             case 16:
-              updateOrderOptions({
-                address_id: addressId,
-                country_code: params === null || params === void 0 ? void 0 : params.country_code
-              });
+              if (!(params && params !== null && params !== void 0 && params.isEdit)) {
+                _context2.next = 23;
+                break;
+              }
+              if (!(addressId !== state.options.address_id)) {
+                _context2.next = 19;
+                break;
+              }
               return _context2.abrupt("return");
-            case 18:
-              updateOrderOptions({
+            case 19:
+              _context2.next = 21;
+              return updateOrderOptions({
                 address_id: addressId,
                 country_code: params === null || params === void 0 ? void 0 : params.country_code
               });
-            case 19:
+            case 21:
+              if (isCountryCodeChanged) {
+                events.emit('country_code_changed', params === null || params === void 0 ? void 0 : params.country_code);
+              }
+              return _context2.abrupt("return");
+            case 23:
+              _context2.next = 25;
+              return updateOrderOptions({
+                address_id: addressId,
+                country_code: params === null || params === void 0 ? void 0 : params.country_code
+              });
+            case 25:
+              if (isCountryCodeChanged) {
+                events.emit('country_code_changed', params === null || params === void 0 ? void 0 : params.country_code);
+              }
+            case 26:
             case "end":
               return _context2.stop();
           }
@@ -411,7 +428,7 @@ var OrderProvider = function OrderProvider(_ref) {
    */
   var changeType = /*#__PURE__*/function () {
     var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(type) {
-      var _state$options9;
+      var _state$options10;
       var options, cityId, params;
       return _regeneratorRuntime().wrap(function _callee3$(_context3) {
         while (1) {
@@ -437,7 +454,7 @@ var OrderProvider = function OrderProvider(_ref) {
                 options: options
               }));
             case 7:
-              cityId = (_state$options9 = state.options) === null || _state$options9 === void 0 ? void 0 : _state$options9.city_id;
+              cityId = (_state$options10 = state.options) === null || _state$options10 === void 0 ? void 0 : _state$options10.city_id;
               params = {
                 type: type
               };
@@ -509,7 +526,7 @@ var OrderProvider = function OrderProvider(_ref) {
    */
   var updateOrderOptions = /*#__PURE__*/function () {
     var _ref6 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5(changes) {
-      var countryCodeFromLocalStorage, customerFromLocalStorage, userCustomerId, body, _state$options10, _state$options10$addr, _ref7, _state$options11, _state$options11$addr, headers, countryCode, _yield$ordering$setAc3, _yield$ordering$setAc4, error, result, carts, options, _err$message2, message;
+      var countryCodeFromLocalStorage, customerFromLocalStorage, userCustomerId, body, _state$options11, _state$options11$addr, _ref7, _state$options12, _state$options12$addr, headers, countryCode, _yield$ordering$setAc3, _yield$ordering$setAc4, error, result, carts, options, _err$message2, message;
       return _regeneratorRuntime().wrap(function _callee5$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
@@ -538,7 +555,7 @@ var OrderProvider = function OrderProvider(_ref) {
               headers = {
                 'X-Socket-Id-X': socket === null || socket === void 0 ? void 0 : socket.getId()
               };
-              countryCode = changes !== null && changes !== void 0 && changes.country_code && (changes === null || changes === void 0 ? void 0 : changes.country_code) !== (state === null || state === void 0 ? void 0 : (_state$options10 = state.options) === null || _state$options10 === void 0 ? void 0 : (_state$options10$addr = _state$options10.address) === null || _state$options10$addr === void 0 ? void 0 : _state$options10$addr.country_code) ? changes === null || changes === void 0 ? void 0 : changes.country_code : (_ref7 = countryCodeFromLocalStorage !== null && countryCodeFromLocalStorage !== void 0 ? countryCodeFromLocalStorage : changes === null || changes === void 0 ? void 0 : changes.country_code) !== null && _ref7 !== void 0 ? _ref7 : state === null || state === void 0 ? void 0 : (_state$options11 = state.options) === null || _state$options11 === void 0 ? void 0 : (_state$options11$addr = _state$options11.address) === null || _state$options11$addr === void 0 ? void 0 : _state$options11$addr.country_code;
+              countryCode = changes !== null && changes !== void 0 && changes.country_code && (changes === null || changes === void 0 ? void 0 : changes.country_code) !== (state === null || state === void 0 ? void 0 : (_state$options11 = state.options) === null || _state$options11 === void 0 ? void 0 : (_state$options11$addr = _state$options11.address) === null || _state$options11$addr === void 0 ? void 0 : _state$options11$addr.country_code) ? changes === null || changes === void 0 ? void 0 : changes.country_code : (_ref7 = countryCodeFromLocalStorage !== null && countryCodeFromLocalStorage !== void 0 ? countryCodeFromLocalStorage : changes === null || changes === void 0 ? void 0 : changes.country_code) !== null && _ref7 !== void 0 ? _ref7 : state === null || state === void 0 ? void 0 : (_state$options12 = state.options) === null || _state$options12 === void 0 ? void 0 : (_state$options12$addr = _state$options12.address) === null || _state$options12$addr === void 0 ? void 0 : _state$options12$addr.country_code;
               if (!countryCode) {
                 _context5.next = 18;
                 break;
@@ -1087,7 +1104,7 @@ var OrderProvider = function OrderProvider(_ref) {
   }();
   var removeOffer = /*#__PURE__*/function () {
     var _ref14 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee12(offerData) {
-      var response, result;
+      var offerRemoveData, response, result;
       return _regeneratorRuntime().wrap(function _callee12$(_context12) {
         while (1) {
           switch (_context12.prev = _context12.next) {
@@ -1108,23 +1125,25 @@ var OrderProvider = function OrderProvider(_ref) {
               setState(_objectSpread(_objectSpread({}, state), {}, {
                 loading: true
               }));
-              _context12.next = 8;
+              offerRemoveData = {
+                business_id: offerData.business_id,
+                offer_id: offerData.offer_id
+              };
+              if (offerData.user_id) offerRemoveData.user_id = offerData.user_id;
+              _context12.next = 10;
               return fetch("".concat(ordering.root, "/carts/remove_offer"), {
                 method: 'POST',
-                body: JSON.stringify({
-                  business_id: offerData.business_id,
-                  offer_id: offerData.offer_id
-                }),
+                body: JSON.stringify(offerRemoveData),
                 headers: {
                   'Content-Type': 'application/json',
                   Authorization: "Bearer ".concat(session.token)
                 }
               });
-            case 8:
+            case 10:
               response = _context12.sent;
-              _context12.next = 11;
+              _context12.next = 13;
               return response.json();
-            case 11:
+            case 13:
               result = _context12.sent;
               if (!result.error) {
                 state.carts["businessId:".concat(result.result.business_id)] = result.result;
@@ -1139,19 +1158,19 @@ var OrderProvider = function OrderProvider(_ref) {
                 loading: false
               }));
               return _context12.abrupt("return", !result.error);
-            case 17:
-              _context12.prev = 17;
+            case 19:
+              _context12.prev = 19;
               _context12.t0 = _context12["catch"](4);
               setState(_objectSpread(_objectSpread({}, state), {}, {
                 loading: false
               }));
               return _context12.abrupt("return", false);
-            case 21:
+            case 23:
             case "end":
               return _context12.stop();
           }
         }
-      }, _callee12, null, [[4, 17]]);
+      }, _callee12, null, [[4, 19]]);
     }));
     return function removeOffer(_x19) {
       return _ref14.apply(this, arguments);
@@ -1685,7 +1704,7 @@ var OrderProvider = function OrderProvider(_ref) {
   };
   var setOptionFromLocalStorage = /*#__PURE__*/function () {
     var _ref21 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee19() {
-      var _configState$configs4, _configState$configs5, _state$options12;
+      var _configState$configs4, _configState$configs5, _state$options13;
       var optionsLocalStorage;
       return _regeneratorRuntime().wrap(function _callee19$(_context19) {
         while (1) {
@@ -1703,7 +1722,7 @@ var OrderProvider = function OrderProvider(_ref) {
                 } : {
                   type: (optionsLocalStorage === null || optionsLocalStorage === void 0 ? void 0 : optionsLocalStorage.type) || orderTypes[configState === null || configState === void 0 ? void 0 : (_configState$configs4 = configState.configs) === null || _configState$configs4 === void 0 ? void 0 : (_configState$configs5 = _configState$configs4.default_order_type) === null || _configState$configs5 === void 0 ? void 0 : _configState$configs5.value],
                   moment: (optionsLocalStorage === null || optionsLocalStorage === void 0 ? void 0 : optionsLocalStorage.moment) || null,
-                  address: (optionsLocalStorage === null || optionsLocalStorage === void 0 ? void 0 : optionsLocalStorage.address) || (state === null || state === void 0 ? void 0 : (_state$options12 = state.options) === null || _state$options12 === void 0 ? void 0 : _state$options12.address) || {},
+                  address: (optionsLocalStorage === null || optionsLocalStorage === void 0 ? void 0 : optionsLocalStorage.address) || (state === null || state === void 0 ? void 0 : (_state$options13 = state.options) === null || _state$options13 === void 0 ? void 0 : _state$options13.address) || {},
                   city_id: (optionsLocalStorage === null || optionsLocalStorage === void 0 ? void 0 : optionsLocalStorage.city_id) || null
                 }
               }));
