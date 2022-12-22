@@ -405,6 +405,12 @@ Object.defineProperty(exports, "MomentOption", {
     return _MomentOption.MomentOption;
   }
 });
+Object.defineProperty(exports, "MultiCartCreate", {
+  enumerable: true,
+  get: function get() {
+    return _MultiCartCreate.MultiCartCreate;
+  }
+});
 Object.defineProperty(exports, "MultiCartsPaymethodsAndWallets", {
   enumerable: true,
   get: function get() {
@@ -987,6 +993,7 @@ var _LogoutAction = require("./components/LogoutAction");
 var _MainSearch = require("./components/MainSearch");
 var _MenuControl = require("./components/MenuControl");
 var _MomentOption = require("./components/MomentOption");
+var _MultiCartCreate = require("./components/MultiCartCreate");
 var _MultiCheckout = require("./components/MultiCheckout");
 var _MultiCartsPaymethodsAndWallets = require("./components/MultiCartsPaymethodsAndWallets");
 var _MultiOrdersDetails = require("./components/MultiOrdersDetails");

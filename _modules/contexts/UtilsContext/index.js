@@ -18,8 +18,8 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0) { ; } } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i.return && (_r = _i.return(), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i.return && (_r = _i.return(), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 _dayjs.default.extend(_utc.default);
 _dayjs.default.extend(_relativeTime.default);
@@ -244,6 +244,60 @@ var UtilsProviders = function UtilsProviders(_ref) {
     if (!url && fallback) return fallback;
     return url;
   };
+  var getOrderState = function getOrderState(num) {
+    switch (num) {
+      case 0:
+        return t('PENDING', 'Pending');
+      case 1:
+        return t('COMPLETED_BY_ADMIN', 'Completed by admin');
+      case 2:
+        return t('REJECTED_BY_ADMIN', 'Rejected by admin');
+      case 3:
+        return t('ORDER_STATUS_IN_BUSINESS', 'Driver arrived to business');
+      case 4:
+        return t('PREPARATION_COMPLETED', 'Preparation Completed');
+      case 5:
+        return t('REJECTED_BY_BUSINESS', 'Rejected by business');
+      case 6:
+        return t('REJECTED_BY_DRIVER', 'Rejected by driver');
+      case 7:
+        return t('ACCEPTED_BY_BUSINESS', 'Accepted by business');
+      case 8:
+        return t('ACCEPTED_BY_DRIVER', 'Accepted by driver');
+      case 9:
+        return t('PICK_UP_COMPLETED_BY_DRIVER', 'Pick up completed by driver');
+      case 10:
+        return t('PICK_UP_FAILED_BY_DRIVER', 'Pick up Failed by driver');
+      case 11:
+        return t('DELIVERY_COMPLETED_BY_DRIVER', 'Delivery completed by driver');
+      case 12:
+        return t('DELIVERY_FAILED_BY_DRIVER', 'Delivery Failed by driver');
+      case 13:
+        return t('PREORDER', 'Preorder');
+      case 14:
+        return t('ORDER_NOT_READY', 'Order not ready');
+      case 15:
+        return t('ORDER_PICKEDUP_COMPLETED_BY_CUSTOMER', 'Pickup completed by customer');
+      case 16:
+        return t('ORDER_STATUS_CANCELLED_BY_CUSTOMER', 'Cancelled by customer');
+      case 17:
+        return t('ORDER_NOT_PICKEDUP_BY_CUSTOMER', 'Not picked by customer');
+      case 18:
+        return t('ORDER_DRIVER_ALMOST_ARRIVED_BUSINESS', 'Driver almost arrived to business');
+      case 19:
+        return t('ORDER_DRIVER_ALMOST_ARRIVED_CUSTOMER', 'Driver almost arrived to customer');
+      case 20:
+        return t('ORDER_CUSTOMER_ALMOST_ARRIVED_BUSINESS', 'Customer almost arrived to business');
+      case 21:
+        return t('ORDER_CUSTOMER_ARRIVED_BUSINESS', 'Customer arrived to business');
+      case 22:
+        return t('ORDER_LOOKING_FOR_DRIVER', 'Looking for driver');
+      case 23:
+        return t('ORDER_DRIVER_ON_WAY', 'Driver on way');
+      default:
+        return 'N/A';
+    }
+  };
   var functions = {
     parsePrice: parsePrice,
     parseNumber: parseNumber,
@@ -253,7 +307,8 @@ var UtilsProviders = function UtilsProviders(_ref) {
     parseShortenDistance: parseShortenDistance,
     getTimeAgo: getTimeAgo,
     getTimeTo: getTimeTo,
-    optimizeImage: optimizeImage
+    optimizeImage: optimizeImage,
+    getOrderState: getOrderState
   };
   (0, _react.useEffect)(function () {
     if (!languageState.loading) {
