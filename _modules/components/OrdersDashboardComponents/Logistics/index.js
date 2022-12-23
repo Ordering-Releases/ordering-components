@@ -4,14 +4,13 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.PhoneAutocomplete = void 0;
+exports.Logistics = void 0;
 var _react = _interopRequireWildcard(require("react"));
-var _propTypes = _interopRequireDefault(require("prop-types"));
-var _ApiContext = require("../../contexts/ApiContext");
-var _SessionContext = require("../../contexts/SessionContext");
-var _OrderContext = require("../../contexts/OrderContext");
-var _BusinessContext = require("../../contexts/BusinessContext");
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _propTypes = _interopRequireWildcard(require("prop-types"));
+var _SessionContext = require("../../../contexts/SessionContext");
+var _ApiContext = require("../../../contexts/ApiContext");
+var _LanguageContext = require("../../../contexts/LanguageContext");
+var _UtilsContext = require("../../../contexts/UtilsContext");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
@@ -29,365 +28,166 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i.return && (_r = _i.return(), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-var PhoneAutocomplete = function PhoneAutocomplete(props) {
-  var UIComponent = props.UIComponent,
-    isIos = props.isIos,
-    businessSlug = props.businessSlug;
+var Logistics = function Logistics(props) {
+  var orderId = props.orderId,
+    UIComponent = props.UIComponent;
   var _useApi = (0, _ApiContext.useApi)(),
     _useApi2 = _slicedToArray(_useApi, 1),
     ordering = _useApi2[0];
   var _useSession = (0, _SessionContext.useSession)(),
     _useSession2 = _slicedToArray(_useSession, 1),
-    _useSession2$ = _useSession2[0],
-    user = _useSession2$.user,
-    token = _useSession2$.token;
-  var _useOrder = (0, _OrderContext.useOrder)(),
-    _useOrder2 = _slicedToArray(_useOrder, 2),
-    orderState = _useOrder2[0],
-    setUserCustomerOptions = _useOrder2[1].setUserCustomerOptions;
-  var _useBusiness = (0, _BusinessContext.useBusiness)(),
-    _useBusiness2 = _slicedToArray(_useBusiness, 1),
-    businessState = _useBusiness2[0];
-  var _useState = (0, _react.useState)(''),
-    _useState2 = _slicedToArray(_useState, 2),
-    phone = _useState2[0],
-    setPhone = _useState2[1];
-  var _useState3 = (0, _react.useState)({
-      customer: false,
-      signup: false
-    }),
-    _useState4 = _slicedToArray(_useState3, 2),
-    openModal = _useState4[0],
-    setOpenModal = _useState4[1];
-  var _useState5 = (0, _react.useState)({
-      loading: false,
-      result: {
-        error: false
-      }
-    }),
-    _useState6 = _slicedToArray(_useState5, 2),
-    customerState = _useState6[0],
-    setCustomerState = _useState6[1];
-  var _useState7 = (0, _react.useState)({
-      users: [],
-      loading: false,
+    session = _useSession2[0];
+  var _useLanguage = (0, _LanguageContext.useLanguage)(),
+    _useLanguage2 = _slicedToArray(_useLanguage, 2),
+    t = _useLanguage2[1];
+  var _useUtils = (0, _UtilsContext.useUtils)(),
+    _useUtils2 = _slicedToArray(_useUtils, 1),
+    _useUtils2$ = _useUtils2[0],
+    getOrderState = _useUtils2$.getOrderState,
+    parseDistance = _useUtils2$.parseDistance;
+
+  /**
+   * Array to save logistics
+   */
+  var _useState = (0, _react.useState)({
+      logs: [],
+      loading: true,
       error: null
     }),
-    _useState8 = _slicedToArray(_useState7, 2),
-    customersPhones = _useState8[0],
-    setCustomersPhones = _useState8[1];
-  var _useState9 = (0, _react.useState)(null),
-    _useState10 = _slicedToArray(_useState9, 2),
-    businessAddress = _useState10[0],
-    setBusinessAddress = _useState10[1];
-  var _useState11 = (0, _react.useState)({
-      open: true,
-      content: []
-    }),
-    _useState12 = _slicedToArray(_useState11, 2),
-    alertState = _useState12[0],
-    setAlertState = _useState12[1];
-  var _useState13 = (0, _react.useState)({
-      loading: false
-    }),
-    _useState14 = _slicedToArray(_useState13, 2),
-    optionsState = _useState14[0],
-    setOptionsState = _useState14[1];
+    _useState2 = _slicedToArray(_useState, 2),
+    logisticList = _useState2[0],
+    setLogisticList = _useState2[1];
+
   /**
-   * Get users from API
+   * Method to get logistics from API
    */
-  var getUsers = /*#__PURE__*/function () {
+  var getLogistics = /*#__PURE__*/function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-      var conditions, _yield$ordering$setAc, result;
+      var requestOptions, response, _yield$response$json, result;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
-            setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
+            _context.prev = 0;
+            setLogisticList(_objectSpread(_objectSpread({}, logisticList), {}, {
               loading: true
             }));
-            conditions = [{
-              attribute: 'cellphone',
-              value: {
-                condition: 'ilike',
-                value: isIos ? "%".concat(phone, "%") : encodeURI("%".concat(phone, "%"))
+            requestOptions = {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: "Bearer ".concat(session.token)
               }
-            }, {
-              attribute: 'phone',
-              value: {
-                condition: 'ilike',
-                value: isIos ? "%".concat(phone, "%") : encodeURI("%".concat(phone, "%"))
-              }
-            }];
-            _context.prev = 2;
+            };
             _context.next = 5;
-            return ordering.setAccessToken(token).users().where({
-              conditions: conditions,
-              conector: 'OR'
-            }).get();
+            return fetch("".concat(ordering.root, "/orders/").concat(orderId, "/logs?order_id=").concat(orderId), requestOptions);
           case 5:
-            _yield$ordering$setAc = _context.sent;
-            result = _yield$ordering$setAc.content.result;
-            setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
-              users: result,
-              loading: false
+            response = _context.sent;
+            _context.next = 8;
+            return response.json();
+          case 8:
+            _yield$response$json = _context.sent;
+            result = _yield$response$json.result;
+            setLogisticList(_objectSpread(_objectSpread({}, logisticList), {}, {
+              loading: false,
+              logs: result
             }));
-            _context.next = 13;
+            _context.next = 16;
             break;
-          case 10:
-            _context.prev = 10;
-            _context.t0 = _context["catch"](2);
-            setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
+          case 13:
+            _context.prev = 13;
+            _context.t0 = _context["catch"](0);
+            setLogisticList(_objectSpread(_objectSpread({}, logisticList), {}, {
               loading: false,
               error: _context.t0.message
             }));
-          case 13:
+          case 16:
           case "end":
             return _context.stop();
         }
-      }, _callee, null, [[2, 10]]);
+      }, _callee, null, [[0, 13]]);
     }));
-    return function getUsers() {
+    return function getLogistics() {
       return _ref.apply(this, arguments);
     };
   }();
-  /**
-   * fetch business to get its address
-   */
-  var getBusiness = /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-      var _yield$ordering$busin, _yield$ordering$busin2, result, error;
-      return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-        while (1) switch (_context2.prev = _context2.next) {
-          case 0:
-            _context2.next = 2;
-            return ordering.businesses('mcbonalds').select(['address', 'location', 'distance']).parameters().get();
-          case 2:
-            _yield$ordering$busin = _context2.sent;
-            _yield$ordering$busin2 = _yield$ordering$busin.content;
-            result = _yield$ordering$busin2.result;
-            error = _yield$ordering$busin2.error;
-            if (!error) {
-              _context2.next = 9;
-              break;
-            }
-            setAlertState({
-              open: true,
-              content: result
-            });
-            return _context2.abrupt("return");
-          case 9:
-            setBusinessAddress(result);
-          case 10:
-          case "end":
-            return _context2.stop();
+  var parseLog = function parseLog(log) {
+    var driverEvents = ['logistic_driver_found', 'logistic_driver_found_group', 'logistic_driver_not_found', 'logistic_driver_not_found_group', 'logistic_driver_found_in_coverage', 'logistic_driver_found_in_coverage_group', 'logistic_driver_found_out_coverage', 'logistic_driver_found_out_coverage_group', 'logistic_driver_autoaccepted', 'logistic_driver_autoaccepted_group', 'logistic_request_autorejected', 'logistic_request_autorejected_group', 'logistic_assign_request_accepted', 'logistic_assign_request_accepted_group', 'logistic_assign_request_rejected', 'logistic_assign_request_rejected_group', 'logistic_manual_driver_assignment', 'logistic_manual_driver_unassignment', 'logistic_driver_autoassigned_group'];
+    var generalEvents = ['logistic_started', 'logistic_finished', 'logistic_expired', 'logistic_resolved', 'logistic_reset', 'logistic_grouped', 'logistic_cancelled', 'logistic_not_grouped', 'logistic_order_queued', 'logistic_order_out_queued', 'logistic_driver_company_not_found'];
+    var parseLogData = function parseLogData(eventName, data) {
+      var message = t('LOG_' + eventName.toUpperCase());
+      for (var key in data) {
+        var replaceBy = data[key];
+        if (key === 'distance' || key === 'coverage') {
+          replaceBy = parseDistance(data[key]);
+        } else if (key === 'with_orders') {
+          replaceBy = data[key].join(', ');
+          key = 'orders';
+        } else if (key === 'status') {
+          replaceBy = getOrderState(data[key]);
         }
-      }, _callee2);
-    }));
-    return function getBusiness() {
-      return _ref2.apply(this, arguments);
-    };
-  }();
-  var checkAddress = function checkAddress(address1, address2) {
-    var props = ['address', 'location'];
-    var values = [];
-    props.forEach(function (prop) {
-      if (address1 && address1[prop]) {
-        if (prop === 'location') {
-          values.push(address2[prop].lat === address1[prop].lat && address2[prop].lng === address1[prop].lng);
-        } else {
-          values.push(address2[prop] === address1[prop]);
-        }
-      } else {
-        values.push(!address2[prop]);
+        message = message.replace('_' + key + '_', replaceBy);
       }
-    });
-    return values.every(function (value) {
-      return value;
-    });
-  };
-  var setGuestOptions = /*#__PURE__*/function () {
-    var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(_ref3) {
-      var _businessState$busine;
-      var customer, _ref3$type, type, onRedirect, businessObj, userObj, _addressSelected, _orderState$options, _yield$ordering$users, _yield$ordering$users2, resultAddresses, error, userAddressFinded, addressSelected, _response$content$res, _addressSelected2, response, addressResponse, options, _addressSelected3;
-      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-        while (1) switch (_context3.prev = _context3.next) {
-          case 0:
-            customer = _ref3.customer, _ref3$type = _ref3.type, type = _ref3$type === void 0 ? 3 : _ref3$type, onRedirect = _ref3.onRedirect;
-            businessObj = (_businessState$busine = businessState === null || businessState === void 0 ? void 0 : businessState.business) !== null && _businessState$busine !== void 0 ? _businessState$busine : businessAddress;
-            userObj = customer !== null && customer !== void 0 ? customer : user;
-            if (!(!businessObj || !(userObj !== null && userObj !== void 0 && userObj.id))) {
-              _context3.next = 5;
-              break;
-            }
-            return _context3.abrupt("return");
-          case 5:
-            _context3.prev = 5;
-            setOptionsState(_objectSpread(_objectSpread({}, optionsState), {}, {
-              loading: true
-            }));
-            _context3.next = 9;
-            return ordering.users(userObj.id).addresses().get();
-          case 9:
-            _yield$ordering$users = _context3.sent;
-            _yield$ordering$users2 = _yield$ordering$users.content;
-            resultAddresses = _yield$ordering$users2.result;
-            error = _yield$ordering$users2.error;
-            if (!error) {
-              _context3.next = 16;
-              break;
-            }
-            setAlertState({
-              open: true,
-              content: resultAddresses
-            });
-            return _context3.abrupt("return");
-          case 16:
-            userAddressFinded = resultAddresses.find(function (address) {
-              return (address === null || address === void 0 ? void 0 : address.location) && checkAddress(businessObj, address) && address;
-            });
-            addressSelected = userAddressFinded !== null && userAddressFinded !== void 0 ? userAddressFinded : null;
-            if ((_addressSelected = addressSelected) !== null && _addressSelected !== void 0 && _addressSelected.id) {
-              _context3.next = 32;
-              break;
-            }
-            _context3.next = 21;
-            return ordering.users(userObj.id).addresses().save({
-              address: businessObj.address,
-              location: businessObj.location
-            });
-          case 21:
-            response = _context3.sent;
-            if (!response.content.error) {
-              _context3.next = 25;
-              break;
-            }
-            setAlertState({
-              open: true,
-              content: response.content.result
-            });
-            return _context3.abrupt("return");
-          case 25:
-            addressSelected = (_response$content$res = response.content.result) !== null && _response$content$res !== void 0 ? _response$content$res : null;
-            _context3.next = 28;
-            return ordering.users(userObj.id).addresses((_addressSelected2 = addressSelected) === null || _addressSelected2 === void 0 ? void 0 : _addressSelected2.id).save({
-              default: true
-            });
-          case 28:
-            addressResponse = _context3.sent;
-            if (!addressResponse.content.error) {
-              _context3.next = 32;
-              break;
-            }
-            setAlertState({
-              open: true,
-              content: addressResponse.content.result
-            });
-            return _context3.abrupt("return");
-          case 32:
-            options = {
-              type: type
-            };
-            if (addressSelected && !checkAddress(orderState === null || orderState === void 0 ? void 0 : (_orderState$options = orderState.options) === null || _orderState$options === void 0 ? void 0 : _orderState$options.address, addressSelected)) {
-              options.address_id = (_addressSelected3 = addressSelected) === null || _addressSelected3 === void 0 ? void 0 : _addressSelected3.id;
-            }
-            if (!(options !== null && options !== void 0 && options.address_id || (user === null || user === void 0 ? void 0 : user.id) !== (customer === null || customer === void 0 ? void 0 : customer.id))) {
-              _context3.next = 37;
-              break;
-            }
-            _context3.next = 37;
-            return setUserCustomerOptions({
-              options: options,
-              customer: userObj
-            });
-          case 37:
-            onRedirect && onRedirect();
-            setOptionsState(_objectSpread(_objectSpread({}, optionsState), {}, {
-              loading: false
-            }));
-            _context3.next = 45;
-            break;
-          case 41:
-            _context3.prev = 41;
-            _context3.t0 = _context3["catch"](5);
-            setAlertState({
-              open: true,
-              content: _context3.t0.message
-            });
-            setOptionsState(_objectSpread(_objectSpread({}, optionsState), {}, {
-              loading: false
-            }));
-          case 45:
-          case "end":
-            return _context3.stop();
-        }
-      }, _callee3, null, [[5, 41]]);
-    }));
-    return function setGuestOptions(_x2) {
-      return _ref4.apply(this, arguments);
+      return message;
     };
-  }();
+    var logData = log.data ? log.data : {};
+    if (driverEvents.indexOf(log.event) !== -1 || log.driver_id) {
+      if (log.driver) {
+        logData.driver = log.driver.name + (log.driver.lastname ? log.driver.lastname : '');
+      }
+      return parseLogData(log.event, logData);
+    } else if (log.driver_company_id || log.external_driver_id) {
+      if (log.driver_company) {
+        logData.driver_company = log.driver_company.name;
+      }
+      if (log.external_driver) {
+        logData.external_driver = log.external_driver.name;
+      }
+      return parseLogData(log.event, logData);
+    } else if (generalEvents.indexOf(log.event) !== -1) {
+      return parseLogData(log.event, logData);
+    }
+    return t(log.event.toUpperCase()) + '<br />' + JSON.stringify(log.data);
+  };
   (0, _react.useEffect)(function () {
-    var _customersPhones$user;
-    if (phone && phone.length >= 7 && (customersPhones === null || customersPhones === void 0 ? void 0 : (_customersPhones$user = customersPhones.users) === null || _customersPhones$user === void 0 ? void 0 : _customersPhones$user.length) === 0) {
-      getUsers();
-    }
-    if (phone && phone.length < 7 || !phone) {
-      setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
-        users: []
-      }));
-    }
-  }, [phone]);
-  (0, _react.useEffect)(function () {
-    var _businessState$busine2;
-    if (businessSlug && !(businessState !== null && businessState !== void 0 && (_businessState$busine2 = businessState.business) !== null && _businessState$busine2 !== void 0 && _businessState$busine2.id)) {
-      getBusiness();
-    }
-  }, [businessSlug]);
+    getLogistics();
+  }, []);
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, UIComponent && /*#__PURE__*/_react.default.createElement(UIComponent, _extends({}, props, {
-    phone: phone,
-    customerState: customerState,
-    customersPhones: customersPhones,
-    setCustomersPhones: setCustomersPhones,
-    onChangeNumber: function onChangeNumber(phone) {
-      return setPhone(phone);
-    },
-    openModal: openModal,
-    setOpenModal: setOpenModal,
-    setCustomerState: setCustomerState,
-    setBusinessAddressToUser: setGuestOptions,
-    alertState: alertState,
-    optionsState: optionsState,
-    checkAddress: checkAddress
+    logisticList: logisticList,
+    parseLog: parseLog
   })));
 };
-exports.PhoneAutocomplete = PhoneAutocomplete;
-PhoneAutocomplete.propTypes = {
+exports.Logistics = Logistics;
+Logistics.propTypes = {
   /**
    * UI Component, this must be containt all graphic elements and use parent props
    */
   UIComponent: _propTypes.default.elementType,
   /**
-   * Components types before payment option stripe direct
+   * Array of drivers props to fetch
+   */
+  propsToFetch: _propTypes.default.arrayOf(_propTypes.string),
+  /**
+   * Components types before my orders
    * Array of type components, the parent props will pass to these components
    */
   beforeComponents: _propTypes.default.arrayOf(_propTypes.default.elementType),
   /**
-   * Components types after payment option stripe direct
+   * Components types after my orders
    * Array of type components, the parent props will pass to these components
    */
   afterComponents: _propTypes.default.arrayOf(_propTypes.default.elementType),
   /**
-   * Elements before payment option stripe direct
+   * Elements before my orders
    * Array of HTML/Components elements, these components will not get the parent props
    */
   beforeElements: _propTypes.default.arrayOf(_propTypes.default.element),
   /**
-   * Elements after payment option stripe direct
+   * Elements after my orders
    * Array of HTML/Components elements, these components will not get the parent props
    */
   afterElements: _propTypes.default.arrayOf(_propTypes.default.element)
 };
-PhoneAutocomplete.defaultProps = {
+Logistics.defaultProps = {
   beforeComponents: [],
   afterComponents: [],
   beforeElements: [],
