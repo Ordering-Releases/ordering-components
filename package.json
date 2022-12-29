@@ -1,6 +1,6 @@
 {
   "name": "ordering-components-external",
-  "version": "1.7.4",
+  "version": "1.9.0",
   "description": "Ordering Internal Dashboard",
   "main": "./_modules/index.js",
   "scripts": {
@@ -60,6 +60,7 @@
     "dayjs": "^1.9.3",
     "firebase": "^9.9.2",
     "libphonenumber-js": "^1.9.17",
+    "moment": "^2.29.4",
     "ordering-api-sdk": "github:Ordering-Releases/ordering-sdk#release",
     "prop-types": "^15.7.2",
     "react-google-recaptcha": "latest",
