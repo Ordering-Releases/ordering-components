@@ -15,6 +15,7 @@ var _EventContext = require("../../contexts/EventContext");
 var _SessionContext = require("../../contexts/SessionContext");
 var _ToastContext = require("../../contexts/ToastContext");
 var _LanguageContext = require("../../contexts/LanguageContext");
+var _WebsocketContext = require("../../contexts/WebsocketContext");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -66,6 +67,7 @@ var ProductForm = function ProductForm(props) {
   var _useApi = (0, _ApiContext.useApi)(),
     _useApi2 = _slicedToArray(_useApi, 1),
     ordering = _useApi2[0];
+  var socket = (0, _WebsocketContext.useWebsocket)();
   /**
    * Events context
   */
@@ -300,7 +302,8 @@ var ProductForm = function ProductForm(props) {
               headers: {
                 'Content-Type': 'application/json',
                 Authorization: "Bearer ".concat(token),
-                'X-App-X': ordering.appId
+                'X-App-X': ordering.appId,
+                'X-Socket-Id-X': socket === null || socket === void 0 ? void 0 : socket.getId()
               }
             }, isAdd && {
               body: JSON.stringify(changes)
@@ -556,20 +559,21 @@ var ProductForm = function ProductForm(props) {
    * Check options to get errors
    */
   var checkErrors = function checkErrors() {
+    var _product$product8, _product$product8$ext;
     var errors = {};
-    if (!product.product) {
+    if (!(product !== null && product !== void 0 && product.product)) {
       return errors;
     }
-    product.product.extras.forEach(function (extra) {
+    (_product$product8 = product.product) === null || _product$product8 === void 0 ? void 0 : (_product$product8$ext = _product$product8.extras) === null || _product$product8$ext === void 0 ? void 0 : _product$product8$ext.forEach(function (extra) {
       extra.options.map(function (option) {
-        var _productCart$options3, _option$suboptions3;
+        var _productCart$options3, _Object$keys, _option$suboptions3;
         var suboptions = (_productCart$options3 = productCart.options["id:".concat(option.id)]) === null || _productCart$options3 === void 0 ? void 0 : _productCart$options3.suboptions;
         var quantity = suboptions ? option.limit_suboptions_by_max ? Object.values(suboptions).reduce(function (count, suboption) {
           return count + suboption.quantity;
-        }, 0) : Object.keys(suboptions).length : 0;
+        }, 0) : (_Object$keys = Object.keys(suboptions)) === null || _Object$keys === void 0 ? void 0 : _Object$keys.length : 0;
         var evaluateRespectTo = false;
         if (option.respect_to && productCart.options) {
-          var options = productCart.options;
+          var options = productCart === null || productCart === void 0 ? void 0 : productCart.options;
           for (var key in options) {
             var _option$suboptions2;
             var _option = options[key];
@@ -598,7 +602,7 @@ var ProductForm = function ProductForm(props) {
    */
   var handleSave = /*#__PURE__*/function () {
     var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(values) {
-      var errors, successful, _values$professional, _values$serviceTime, _orderState$options, _props$productCart6, changes, currentProduct, _props$productCart7, _product$product8, updatedProfessional, duration;
+      var errors, successful, _values$professional, _values$serviceTime, _orderState$options, _props$productCart6, changes, currentProduct, _props$productCart7, _product$product9, updatedProfessional, duration;
       return _regeneratorRuntime().wrap(function _callee3$(_context3) {
         while (1) switch (_context3.prev = _context3.next) {
           case 0:
@@ -646,7 +650,7 @@ var ProductForm = function ProductForm(props) {
               onSave(productCart, !((_props$productCart7 = props.productCart) !== null && _props$productCart7 !== void 0 && _props$productCart7.code));
               if (isService) {
                 updatedProfessional = JSON.parse(JSON.stringify(values === null || values === void 0 ? void 0 : values.professional));
-                duration = product === null || product === void 0 ? void 0 : (_product$product8 = product.product) === null || _product$product8 === void 0 ? void 0 : _product$product8.duration;
+                duration = product === null || product === void 0 ? void 0 : (_product$product9 = product.product) === null || _product$product9 === void 0 ? void 0 : _product$product9.duration;
                 updatedProfessional.busy_times.push({
                   start: values === null || values === void 0 ? void 0 : values.serviceTime,
                   end: (0, _moment.default)(values === null || values === void 0 ? void 0 : values.serviceTime).add(duration, 'minutes').format('YYYY-MM-DD HH:mm:ss'),
@@ -801,7 +805,8 @@ var ProductForm = function ProductForm(props) {
    * Check if there is an option required with one suboption
    */
   (0, _react.useEffect)(function () {
-    if (product !== null && product !== void 0 && product.product && Object.keys(product === null || product === void 0 ? void 0 : product.product).length) {
+    var _product$product10, _product$product10$ex;
+    if (product !== null && product !== void 0 && product.product && ((_product$product10 = product.product) === null || _product$product10 === void 0 ? void 0 : (_product$product10$ex = _product$product10.extras) === null || _product$product10$ex === void 0 ? void 0 : _product$product10$ex.length) > 0) {
       var _ref6, _ref7;
       var options = (_ref6 = []).concat.apply(_ref6, _toConsumableArray(product.product.extras.map(function (extra) {
         return extra.options.filter(function (option) {

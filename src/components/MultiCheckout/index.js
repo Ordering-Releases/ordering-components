@@ -6,6 +6,7 @@ import { useApi } from '../../contexts/ApiContext'
 import { useSession } from '../../contexts/SessionContext'
 import { useToast, ToastType } from '../../contexts/ToastContext'
 import { useLanguage } from '../../contexts/LanguageContext'
+import { useWebsocket } from '../../contexts/WebsocketContext'
 
 /**
  * Component to manage Multi businesses checkout page behavior without UI component
@@ -15,15 +16,19 @@ export const MultiCheckout = (props) => {
     UIComponent,
     onPlaceOrderClick,
     cartUuid,
+    userId,
     actionsBeforePlace
   } = props
 
+  const qParams = userId ? `?user_id=${userId}` : ''
+
   const [ordering] = useApi()
+  const socket = useWebsocket()
   /**
    * Session content
    */
   const [{ token }] = useSession()
-  const [{ carts }, { placeMulitCarts }] = useOrder()
+  const [{ carts }, { placeMultiCarts }] = useOrder()
   /**
 * Toast state
 */
@@ -38,13 +43,13 @@ export const MultiCheckout = (props) => {
   */
   const [deliveryOptionSelected, setDeliveryOptionSelected] = useState(undefined)
 
-  const openCarts = (Object.values(carts)?.filter(cart => cart?.valid && cart?.group?.uuid === cartUuid) || null) || []
-  const totalCartsPrice = openCarts && openCarts.reduce((total, cart) => { return total + cart?.total }, 0)
-  const cartsUuids = openCarts.reduce((uuids, cart) => [...uuids, cart.uuid], [])
-
   const [placing, setPlacing] = useState(false)
   const [paymethodSelected, setPaymethodSelected] = useState({})
   const [cartGroup, setCartGroup] = useState({ loading: true, error: null, result: null })
+
+  const openCarts = (cartGroup?.result?.carts?.filter(cart => cart?.valid && cart?.status !== 1) || null) || []
+  const totalCartsPrice = openCarts?.length && openCarts.reduce((total, cart) => { return total + cart?.total }, 0)
+  const totalCartsFee = openCarts?.length && openCarts?.filter(cart => cart?.status !== 1 && cart?.valid)?.reduce((total, cart) => { return total + (cart?.delivery_price_with_discount) }, 0)
 
   const handleGroupPlaceOrder = async () => {
     let paymethodData = paymethodSelected?.paymethod_data
@@ -76,7 +81,7 @@ export const MultiCheckout = (props) => {
       }
     }
     setPlacing(true)
-    const { error, result } = await placeMulitCarts(payload, cartUuid)
+    const { error, result } = await placeMultiCarts(payload, cartUuid)
 
     if (result?.paymethod_data?.status === 2 && actionsBeforePlace) {
       await actionsBeforePlace(paymethodSelected, result)
@@ -120,11 +125,13 @@ export const MultiCheckout = (props) => {
 
   const getDeliveryOptions = async () => {
     try {
-      const response = await fetch(`${ordering.root}/delivery_options`, {
+      const response = await fetch(`${ordering.root}/delivery_options${qParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `bearer ${token}`
+          Authorization: `bearer ${token}`,
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId()
         }
       })
       const { result, error } = await response.json()
@@ -144,15 +151,17 @@ export const MultiCheckout = (props) => {
     try {
       const allPromise = cartUuidArr.map(cartId => {
         return new Promise(async (resolve, reject) => {
+          const body = { delivery_option_id: value }
+          if (userId) body.user_id = userId
           const response = await fetch(`${ordering.root}/carts/${cartId}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `bearer ${token}`
+              Authorization: `bearer ${token}`,
+              'X-App-X': ordering.appId,
+              'X-Socket-Id-X': socket?.getId()
             },
-            body: JSON.stringify({
-              delivery_option_id: value
-            })
+            body: JSON.stringify(body)
           })
           const { result, error } = await response.json()
           if (!error && result?.delivery_option_id === value) {
@@ -180,12 +189,13 @@ export const MultiCheckout = (props) => {
         ...cartGroup,
         loading: true
       })
-      const response = await fetch(`${ordering.root}/cart_groups/${cartUuid}`, {
+      const response = await fetch(`${ordering.root}/cart_groups/${cartUuid}${qParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `bearer ${token}`,
-          'X-App-X': ordering.appId
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId()
         }
       })
       const { result, error } = await response.json()
@@ -235,6 +245,7 @@ export const MultiCheckout = (props) => {
           deliveryOptionSelected={deliveryOptionSelected}
           instructionsOptions={instructionsOptions}
           cartGroup={cartGroup}
+          totalCartsFee={totalCartsFee}
         />
       )}
     </>

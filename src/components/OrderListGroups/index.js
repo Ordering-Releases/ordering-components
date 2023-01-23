@@ -22,9 +22,9 @@ export const OrderListGroups = (props) => {
   } = props
 
   const [ordering] = useApi()
+  const socket = useWebsocket()
   const [session] = useSession()
   const [events] = useEvent()
-  const socket = useWebsocket()
   const [, t] = useLanguage()
   const [, { showToast }] = useToast()
   const [{ configs }] = useConfig()
@@ -112,7 +112,7 @@ export const OrderListGroups = (props) => {
             attribute: 'id',
             value: {
               condition: '!=',
-              value: ordersGroup[currentTabSelected]?.orders.map((o) => o.id)
+              value: ordersGroup[currentTabSelected]?.orders?.map((o) => o.id)
             }
           })
         }
@@ -268,7 +268,7 @@ export const OrderListGroups = (props) => {
     }
 
     if (newFetch) {
-      ordersStatusArray.map(tab => {
+      ordersStatusArray?.map(tab => {
         ordersGroup = {
           ...ordersGroup,
           [tab]: {
@@ -404,7 +404,15 @@ export const OrderListGroups = (props) => {
       setMessages({ ...messages, loading: true })
       const url = `${ordering.root}/orders/${orderId}/messages?mode=dashboard`
 
-      const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` } })
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId()
+        }
+      })
       const { error, result } = await response.json()
       if (!error) {
         setMessages({
@@ -440,7 +448,7 @@ export const OrderListGroups = (props) => {
       }
 
       const isError = errorState.some((e) => e.error)
-      const idsDeleted = errorState.map((obj) => !obj.error && obj.id)
+      const idsDeleted = errorState?.map((obj) => !obj.error && obj.id)
 
       onOrdersDeleted && onOrdersDeleted({ isError, list: idsDeleted })
       setOrdersDeleted({ ...ordersDeleted, loading: false })
@@ -472,7 +480,15 @@ export const OrderListGroups = (props) => {
     try {
       setlogisticOrders({ ...logisticOrders, loading: true })
       const url = `${ordering.root}/drivers/${session.user?.id}/assign_requests`
-      const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` } })
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId()
+        }
+      })
       const { result, error } = await response.json()
       if (!error) {
         setlogisticOrders({ ...logisticOrders, loading: false, orders: result.filter(order => !(order?.order_group && order?.order_group?.orders?.length === 0)) })
@@ -500,7 +516,7 @@ export const OrderListGroups = (props) => {
     const ordersGroupids = []
 
     totalOrders = totalOrders
-      .map(item => {
+      ?.map(item => {
         if (!item?.cart_group_id) return item
 
         const groupIds = totalOrders.filter(o => o.cart_group_id === item?.cart_group_id)
@@ -588,7 +604,7 @@ export const OrderListGroups = (props) => {
     } else {
       const status = getStatusById(order?.order_group?.orders?.[0]?.status)
       let orderList
-      ordersGroups.map(order => {
+      ordersGroups?.map(order => {
         orderList = ordersGroup[status]?.orders
         const indexToUpdate = orderList?.findIndex((o) => o?.id === order?.id)
         orderList[indexToUpdate] = order
@@ -652,7 +668,7 @@ export const OrderListGroups = (props) => {
         }
       }
 
-      const result = await Promise.all(orderIds.map(id => setOrderStatus(id)))
+      const result = await Promise.all(orderIds?.map(id => setOrderStatus(id)))
       return result
     } catch (err) {
       return err?.message ?? err
@@ -668,7 +684,8 @@ export const OrderListGroups = (props) => {
             headers: {
               Authorization: `Bearer ${session.token}`,
               'Content-Type': 'application/json',
-              'X-App-X': ordering.appId
+              'X-App-X': ordering.appId,
+              'X-Socket-Id-X': socket?.getId()
             },
             body: JSON.stringify(body)
           })
@@ -679,10 +696,10 @@ export const OrderListGroups = (props) => {
         }
       }
 
-      const result = await Promise.all(orderIds.map(id => setCustomerReview({ ...body, order_id: id, user_id: customerId })))
+      const result = await Promise.all(orderIds?.map(id => setCustomerReview({ ...body, order_id: id, user_id: customerId })))
       if (result?.length) {
         const orders = ordersGroup[currentTabSelected].orders
-        result.map(order => {
+        result?.map(order => {
           let orderFound = orders.find(o => o.id === order.order_id)
           const idxOrderFound = orders.findIndex(o => o.id === order.order_id)
 

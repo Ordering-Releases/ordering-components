@@ -8,6 +8,7 @@ import { useEvent } from '../../contexts/EventContext'
 import { useSession } from '../../contexts/SessionContext'
 import { ToastType, useToast } from '../../contexts/ToastContext'
 import { useLanguage } from '../../contexts/LanguageContext'
+import { useWebsocket } from '../../contexts/WebsocketContext'
 
 export const ProductForm = (props) => {
   const {
@@ -32,6 +33,7 @@ export const ProductForm = (props) => {
   const [, t] = useLanguage()
 
   const [ordering] = useApi()
+  const socket = useWebsocket()
   /**
    * Events context
   */
@@ -198,7 +200,8 @@ export const ProductForm = (props) => {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
-          'X-App-X': ordering.appId
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId()
         },
         ...(isAdd && { body: JSON.stringify(changes) })
       }
@@ -412,21 +415,21 @@ export const ProductForm = (props) => {
    */
   const checkErrors = () => {
     const errors = {}
-    if (!product.product) {
+    if (!product?.product) {
       return errors
     }
-    product.product.extras.forEach(extra => {
+    product.product?.extras?.forEach(extra => {
       extra.options.map(option => {
         const suboptions = productCart.options[`id:${option.id}`]?.suboptions
         const quantity = suboptions
           ? (option.limit_suboptions_by_max
             ? Object.values(suboptions).reduce((count, suboption) => {
               return count + suboption.quantity
-            }, 0) : Object.keys(suboptions).length)
+            }, 0) : Object.keys(suboptions)?.length)
           : 0
         let evaluateRespectTo = false
         if (option.respect_to && productCart.options) {
-          const options = productCart.options
+          const options = productCart?.options
           for (const key in options) {
             const _option = options[key]
             if (_option.suboptions[`id:${option.respect_to}`]?.selected) {
@@ -616,7 +619,7 @@ export const ProductForm = (props) => {
    * Check if there is an option required with one suboption
    */
   useEffect(() => {
-    if (product?.product && Object.keys(product?.product).length) {
+    if (product?.product && product.product?.extras?.length > 0) {
       const options = [].concat(...product.product.extras.map(extra => extra.options.filter(
         option => (
           (option.min === 1 &&

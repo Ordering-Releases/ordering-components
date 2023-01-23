@@ -23,12 +23,12 @@ export const OrderContext = createContext()
  * This provider has a reducer for manage order state
  * @param {props} props
  */
-export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToast, franchiseId, isDisabledDefaultOpts }) => {
+export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToast, franchiseId, isDisabledDefaultOpts, businessSlug }) => {
   const [confirmAlert, setConfirm] = useState({ show: false })
   const [alert, setAlert] = useState({ show: false })
   const [ordering] = useApi()
-  const [languageState, t] = useLanguage()
   const socket = useWebsocket()
+  const [languageState, t] = useLanguage()
   const [events] = useEvent()
   const [configState] = useConfig()
   const [session, { logout }] = useSession()
@@ -89,6 +89,8 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
 
       if (countryCode) {
         options.headers = {
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId(),
           'X-Country-Code-X': countryCode
         }
       }
@@ -314,8 +316,10 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
       }
       try {
         setState({ ...state, loading: true })
+        const options = {}
         state.loading = true
-        let headers = {
+        options.headers = {
+          'X-App-X': ordering.appId,
           'X-Socket-Id-X': socket?.getId()
         }
         const countryCode = changes?.country_code && changes?.country_code !== state?.options?.address?.country_code
@@ -323,11 +327,17 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
           : countryCodeFromLocalStorage ?? changes?.country_code ?? state?.options?.address?.country_code
 
         if (countryCode) {
-          headers = {
-            ...headers,
+          options.headers = {
+            ...options.headers,
             'X-Country-Code-X': countryCode
           }
           await strategy.setItem('country-code', countryCode)
+        }
+        if (franchiseId) {
+          options.query = {
+            ...options.query,
+            franchise_id: franchiseId
+          }
         }
         if (body?.country_code) {
           delete body?.country_code
@@ -335,7 +345,7 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
         const { content: { error, result } } = await ordering
           .setAccessToken(session.token)
           .orderOptions()
-          .save(body, { headers })
+          .save(body, options)
         if (!error) {
           const { carts, ...options } = result
           state.carts = {}
@@ -370,17 +380,32 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
    * @param {object} cart cart of the product
    * @param {boolean} isQuickAddProduct option to add product when clicks
    */
-  const addProduct = async (product, cart, isQuickAddProduct) => {
+  const addProduct = async (product, cart, isQuickAddProduct, isPlatformProduct = false) => {
     try {
       setState({ ...state, loading: true })
+      const countryCode = await strategy.getItem('country-code')
       const customerFromLocalStorage = await strategy.getItem('user-customer', true)
       const userCustomerId = customerFromLocalStorage?.id
-      const body = {
-        product,
-        business_id: cart.business_id,
-        user_id: userCustomerId || session.user.id
+
+      let body
+      if (!isPlatformProduct) {
+        body = {
+          product,
+          business_id: cart.business_id,
+          user_id: userCustomerId || session.user.id
+        }
+      } else {
+        body = {
+          platform_product: { ...product }
+        }
       }
-      const { content: { error, result } } = await ordering.setAccessToken(session.token).carts().addProduct(body, { headers: { 'X-Socket-Id-X': socket?.getId() } })
+      const { content: { error, result } } = await ordering.setAccessToken(session.token).carts().addProduct(body, {
+        headers: {
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId(),
+          'X-Country-Code-X': countryCode
+        }
+      })
       if (!error) {
         state.carts[`businessId:${result.business_id}`] = result
         events.emit('cart_product_added', product, result)
@@ -391,10 +416,18 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
         setAlert({ show: true, content: result })
       }
       setState({ ...state, loading: false })
-      return !error
+      if (isPlatformProduct) {
+        return { error, result }
+      } else {
+        return !error
+      }
     } catch (err) {
       setState({ ...state, loading: false })
-      return false
+      if (isPlatformProduct) {
+        return { error: true, result: err.message }
+      } else {
+        return false
+      }
     }
   }
 
@@ -404,6 +437,7 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
   const removeProduct = async (product, cart) => {
     try {
       setState({ ...state, loading: true })
+      const countryCode = await strategy.getItem('country-code')
       const customerFromLocalStorage = await strategy.getItem('user-customer', true)
       const userCustomerId = customerFromLocalStorage?.id
       const body = {
@@ -415,7 +449,13 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
         business_id: cart.business_id,
         user_id: userCustomerId || session.user.id
       }
-      const { content: { error, result } } = await ordering.setAccessToken(session.token).carts().removeProduct(body, { headers: { 'X-Socket-Id-X': socket?.getId() } })
+      const { content: { error, result } } = await ordering.setAccessToken(session.token).carts().removeProduct(body, {
+        headers: {
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId(),
+          'X-Country-Code-X': countryCode
+        }
+      })
       if (!error) {
         state.carts[`businessId:${result.business_id}`] = result
         events.emit('cart_product_removed', product, result)
@@ -437,13 +477,24 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
   const clearCart = async (uuid) => {
     try {
       setState({ ...state, loading: true })
+      const countryCode = await strategy.getItem('country-code')
       const customerFromLocalStorage = await strategy.getItem('user-customer', true)
       const userCustomerId = customerFromLocalStorage?.id
       const body = JSON.stringify({
         uuid,
         user_id: userCustomerId || session.user.id
       })
-      const response = await fetch(`${ordering.root}/carts/clear`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Socket-Id-X': socket?.getId(), Authorization: `Bearer ${session.token}` }, body })
+      const response = await fetch(`${ordering.root}/carts/clear`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.token}`,
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId(),
+          'X-Country-Code-X': countryCode
+        },
+        body
+      })
       const { error, result } = await response.json()
       if (!error) {
         state.carts[`businessId:${result.business_id}`] = result
@@ -464,6 +515,7 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
   const updateProduct = async (product, cart, isQuickAddProduct) => {
     try {
       setState({ ...state, loading: true })
+      const countryCode = await strategy.getItem('country-code')
       const customerFromLocalStorage = await strategy.getItem('user-customer', true)
       const userCustomerId = customerFromLocalStorage?.id
       const body = {
@@ -471,7 +523,13 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
         business_id: cart.business_id,
         user_id: userCustomerId || session.user.id
       }
-      const { content: { error, result } } = await ordering.setAccessToken(session.token).carts().updateProduct(body, { headers: { 'X-Socket-Id-X': socket?.getId() } })
+      const { content: { error, result } } = await ordering.setAccessToken(session.token).carts().updateProduct(body, {
+        headers: {
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId(),
+          'X-Country-Code-X': countryCode
+        }
+      })
       if (!error) {
         state.carts[`businessId:${result.business_id}`] = result
         events.emit('cart_product_updated', product, result)
@@ -504,6 +562,7 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
 
     try {
       setState({ ...state, loading: true })
+      const countryCode = await strategy.getItem('country-code')
       if (customParams && isAlsea) {
         const response = await fetch('https://alsea-plugins.ordering.co/alseaplatform/vcoupon2.php', {
           method: 'POST',
@@ -515,7 +574,10 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Access-Control-Allow-Origin': '*'
+            'Access-Control-Allow-Origin': '*',
+            'X-App-X': ordering.appId,
+            'X-Socket-Id-X': socket?.getId(),
+            'X-Country-Code-X': countryCode
           }
         })
         const result = await response.json()
@@ -536,7 +598,13 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
       const { content } = await ordering
         .setAccessToken(session.token)
         .carts()
-        .applyCoupon(body, { headers: { 'X-Socket-Id-X': socket?.getId() } })
+        .applyCoupon(body, {
+          headers: {
+            'X-App-X': ordering.appId,
+            'X-Socket-Id-X': socket?.getId(),
+            'X-Country-Code-X': countryCode
+          }
+        })
       const result = content
       if (!result.error) {
         state.carts[`businessId:${result.result.business_id}`] = result.result
@@ -561,6 +629,7 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
     }
     try {
       setState({ ...state, loading: true })
+      const countryCode = await strategy.getItem('country-code')
       const response = await fetch(`${ordering.root}/carts/add_offer`, {
         method: 'POST',
         body: JSON.stringify({
@@ -571,7 +640,10 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
         }),
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.token}`
+          Authorization: `Bearer ${session.token}`,
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId(),
+          'X-Country-Code-X': countryCode
         }
       })
       const result = await response.json()
@@ -597,6 +669,7 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
       throw new Error('`offer_id` is required.')
     }
     try {
+      const countryCode = await strategy.getItem('country-code')
       setState({ ...state, loading: true })
       const offerRemoveData = {
         business_id: offerData.business_id,
@@ -608,7 +681,10 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
         body: JSON.stringify(offerRemoveData),
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.token}`
+          Authorization: `Bearer ${session.token}`,
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId(),
+          'X-Country-Code-X': countryCode
         }
       })
       const result = await response.json()
@@ -641,6 +717,7 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
     }
     try {
       setState({ ...state, loading: true })
+      const countryCode = await strategy.getItem('country-code')
       const customerFromLocalStorage = await strategy.getItem('user-customer', true)
       const userCustomerId = customerFromLocalStorage?.id
       const body = {
@@ -648,7 +725,13 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
         [isFixedPrice ? 'driver_tip' : 'driver_tip_rate']: driverTipRate,
         user_id: userCustomerId || session.user.id
       }
-      const { content: { error, result } } = await ordering.setAccessToken(session.token).carts().changeDriverTip(body, { headers: { 'X-Socket-Id-X': socket?.getId() } })
+      const { content: { error, result } } = await ordering.setAccessToken(session.token).carts().changeDriverTip(body, {
+        headers: {
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId(),
+          'X-Country-Code-X': countryCode
+        }
+      })
       if (!error) {
         state.carts[`businessId:${result.business_id}`] = result
         events.emit('cart_updated', result)
@@ -681,6 +764,7 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
     }
     try {
       setState({ ...state, loading: true })
+      const countryCode = await strategy.getItem('country-code')
       const customerFromLocalStorage = await strategy.getItem('user-customer', true)
       const userCustomerId = customerFromLocalStorage?.id
       const body = {
@@ -689,7 +773,13 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
         paymethod_data: paymethodData,
         user_id: userCustomerId ?? session.user.id
       }
-      const { content: { error, result } } = await ordering.setAccessToken(session.token).carts().changePaymethod(body, { headers: { 'X-Socket-Id-X': socket?.getId() } })
+      const { content: { error, result } } = await ordering.setAccessToken(session.token).carts().changePaymethod(body, {
+        headers: {
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId(),
+          'X-Country-Code-X': countryCode
+        }
+      })
       if (!error) {
         state.carts[`businessId:${result.business_id}`] = result
         events.emit('cart_updated', result)
@@ -707,13 +797,20 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
   const placeCart = async (cardId, data) => {
     try {
       setState({ ...state, loading: true })
+      const countryCode = await strategy.getItem('country-code')
       const customerFromLocalStorage = await strategy.getItem('user-customer', true)
       const userCustomerId = customerFromLocalStorage?.id
       const body = {
         ...data,
         user_id: userCustomerId || session.user.id
       }
-      const { content: { error, result } } = await ordering.setAccessToken(session.token).carts(cardId).place(body, { headers: { 'X-Socket-Id-X': socket?.getId() } })
+      const { content: { error, result } } = await ordering.setAccessToken(session.token).carts(cardId).place(body, {
+        headers: {
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId(),
+          'X-Country-Code-X': countryCode
+        }
+      })
       if (!error) {
         if (result.status !== 1) {
           state.carts[`businessId:${result.business_id}`] = result
@@ -750,16 +847,26 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
   /**
    * Place multi carts
    */
-  const placeMulitCarts = async (data, cartUuid) => {
+  const placeMultiCarts = async (data, cartUuid) => {
     try {
       setState({ ...state, loading: true })
+      const countryCode = await strategy.getItem('country-code')
+      const customerFromLocalStorage = await strategy.getItem('user-customer', true)
+      const userCustomerId = customerFromLocalStorage?.id
+      const body = {
+        ...data,
+        user_id: userCustomerId || session.user.id
+      }
       const requestOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `bearer ${session.token}`
+          Authorization: `bearer ${session.token}`,
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId(),
+          'X-Country-Code-X': countryCode
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(body)
       }
 
       const response = await fetch(`${ordering.root}/cart_groups/${cartUuid}/place`, requestOptions)
@@ -797,6 +904,7 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
   const confirmCart = async (cardId, data) => {
     try {
       setState({ ...state, loading: true })
+      const countryCode = await strategy.getItem('country-code')
       const customerFromLocalStorage = await strategy.getItem('user-customer', true)
       const userCustomerId = customerFromLocalStorage?.id
       const body = {
@@ -805,9 +913,21 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
       }
       let fetchurl
       if (body.user_id === userCustomerId) {
-        fetchurl = await ordering.setAccessToken(session.token).carts(cardId).confirmWithData(body, { headers: { 'X-Socket-Id-X': socket?.getId() } })
+        fetchurl = await ordering.setAccessToken(session.token).carts(cardId).confirmWithData(body, {
+          headers: {
+            'X-App-X': ordering.appId,
+            'X-Socket-Id-X': socket?.getId(),
+            'X-Country-Code-X': countryCode
+          }
+        })
       } else {
-        fetchurl = await ordering.setAccessToken(session.token).carts(cardId).confirm(body, { headers: { 'X-Socket-Id-X': socket?.getId() } })
+        fetchurl = await ordering.setAccessToken(session.token).carts(cardId).confirm(body, {
+          headers: {
+            'X-App-X': ordering.appId,
+            'X-Socket-Id-X': socket?.getId(),
+            'X-Country-Code-X': countryCode
+          }
+        })
       }
       const { content: { error, result, cart } } = fetchurl
       if (!error) {
@@ -838,12 +958,15 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
   const confirmMultiCarts = async (cartUuid) => {
     try {
       setState({ ...state, loading: true })
+      const countryCode = await strategy.getItem('country-code')
       const requestOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `bearer ${session.token}`,
-          'X-App-X': ordering.appId
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId(),
+          'X-Country-Code-X': countryCode
         }
       }
       const response = await fetch(`${ordering.root}/cart_groups/${cartUuid}/confirm`, requestOptions)
@@ -875,13 +998,18 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
   const reorder = async (orderId) => {
     try {
       setState({ ...state, loading: true })
+      const countryCode = await strategy.getItem('country-code')
       const customerFromLocalStorage = await strategy.getItem('user-customer', true)
       const userCustomerId = customerFromLocalStorage?.id
       const query = userCustomerId
         ? { user_id: userCustomerId }
         : null
       const options = {
-        headers: { 'X-Socket-Id-X': socket?.getId() }
+        headers: {
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId(),
+          'X-Country-Code-X': countryCode
+        }
       }
       if (query) {
         options.query = query
@@ -927,12 +1055,55 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
   const getLastOrderHasNoReview = async () => {
     if (session?.token) {
       const pastOrderTypes = [1, 2, 5, 6, 10, 11, 12, 15, 16, 17]
+      const where = [{ attribute: 'status', value: pastOrderTypes }]
+      if (franchiseId) {
+        where.push({
+          attribute: 'ref_business',
+          conditions: [
+            {
+              attribute: 'franchise_id',
+              value: {
+                condition: '=',
+                value: franchiseId
+              }
+            }
+          ]
+        })
+      }
+      if (typeof businessSlug === 'number' && businessSlug) {
+        where.push({
+          attribute: 'ref_business',
+          conditions: [
+            {
+              attribute: 'id',
+              value: {
+                condition: '=',
+                value: businessSlug
+              }
+            }
+          ]
+        })
+      }
+      if (typeof businessSlug === 'string' && businessSlug) {
+        where.push({
+          attribute: 'ref_business',
+          conditions: [
+            {
+              attribute: 'slug',
+              value: {
+                condition: '=',
+                value: businessSlug
+              }
+            }
+          ]
+        })
+      }
       const options = {
         query: {
           orderBy: '-delivery_datetime',
           page: 1,
           page_size: 10,
-          where: [{ attribute: 'status', value: pastOrderTypes }]
+          where
         }
       }
       const { content: { result, error } } = await ordering.setAccessToken(session?.token).orders().get(options)
@@ -1094,7 +1265,7 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
     changePaymethod,
     setUserCustomerOptions,
     setStateValues,
-    placeMulitCarts,
+    placeMultiCarts,
     getLastOrderHasNoReview,
     changeCityFilter,
     confirmMultiCarts
