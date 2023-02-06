@@ -11,6 +11,7 @@ import { useOrder } from '../../contexts/OrderContext'
 export const OrderDetails = (props) => {
   const {
     orderId,
+    orderAssingId,
     hashKey,
     UIComponent,
     userCustomerId,
@@ -23,7 +24,6 @@ export const OrderDetails = (props) => {
   const [{ user, token, loading }] = useSession()
   const accessToken = props.accessToken || token
   const [ordering] = useApi()
-  const socket = useWebsocket()
   const [, { showToast }] = useToast()
   const [, t] = useLanguage()
   const [events] = useEvent()
@@ -33,6 +33,7 @@ export const OrderDetails = (props) => {
   const [drivers, setDrivers] = useState({ drivers: [], loadingDriver: false, error: null })
   const [messageErrors, setMessageErrors] = useState({ status: null, loading: false, error: null })
   const [messages, setMessages] = useState({ loading: true, error: null, messages: [] })
+  const socket = useWebsocket()
   const [driverLocation, setDriverLocation] = useState(props.order?.driver?.location || orderState.order?.driver?.location || null)
   const [messagesReadList, setMessagesReadList] = useState(false)
   const [driverUpdateLocation, setDriverUpdateLocation] = useState({ loading: false, error: null, newLocation: null })
@@ -246,16 +247,41 @@ export const OrderDetails = (props) => {
     }
 
     try {
-      const { content: { error, result } } = await ordering.setAccessToken(token).orders(orderId).get({ ...options, cancelToken: source })
-      const order = error ? null : result
-      const err = error ? result : null
+      let result, error
+      if (orderAssingId) {
+        const response = await fetch(`${ordering.root}/drivers/${user.id}/assign_requests/${orderAssingId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'X-App-X': ordering.appId,
+            'X-Socket-Id-X': socket?.getId()
+          }
+        })
+        const res = await response.json()
+        result = res.result
+        error = res.error
+      } else {
+        const { content } = await ordering.setAccessToken(token).orders(orderId).get({ ...options, cancelToken: source })
+        result = content.result
+        error = content.error
+      }
+      const order = error ? null : result?.order || result
+      let err = error ? result : null
       let businessData = null
+      if (err) {
+        setOrderState({
+          ...orderState,
+          loading: false,
+          error: [err ?? 'ERROR']
+        })
+        return
+      }
       try {
-        const { content } = await ordering.setAccessToken(token).businesses(order.business_id).select(propsToFetch).get({ cancelToken: source })
+        const { content } = await ordering.setAccessToken(token).businesses(order?.business_id).select(propsToFetch).get({ cancelToken: source })
         businessData = content.result
-        content.error && err.push(content.result[0])
+        content.error && (err = content.result[0])
       } catch (e) {
-        err.push(e.message)
+        err = [e.message ?? 'ERROR']
       }
 
       if (isFetchDrivers) {
@@ -273,7 +299,7 @@ export const OrderDetails = (props) => {
       setOrderState({
         ...orderState,
         loading: false,
-        error: e.message ? orderState.error?.push(e?.message) : ['ERROR']
+        error: [e.message ?? 'ERROR']
       })
     }
   }
