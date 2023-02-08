@@ -218,6 +218,7 @@ export const SignupForm = (props) => {
 
     setSignupData({
       ...signupData,
+      ...values,
       email: email,
       cellphone: cellphone,
       country_phone_code: countryPhoneCode
@@ -225,12 +226,12 @@ export const SignupForm = (props) => {
     try {
       setCheckPhoneCodeState({ ...checkPhoneCodeState, loading: true, result: { error: false, result: null } })
       setWillVerifyOtpState(true)
-      if (signUpTab === 'otpCellphone') {
+      // if (signUpTab === 'otpCellphone') {
         body.country_phone_code = countryPhoneCode
         body.cellphone = cellphone
-      } else {
-        body.email = email
-      }
+      // } else {
+      //   body.email = email
+      // }
       const response = await fetch(`${ordering.root}/codes/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
