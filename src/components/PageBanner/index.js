@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useApi } from '../../contexts/ApiContext'
+import { useWebsocket } from '../../contexts/WebsocketContext'
 
 export const PageBanner = (props) => {
   const {
@@ -9,6 +10,7 @@ export const PageBanner = (props) => {
   } = props
 
   const [ordering] = useApi()
+  const socket = useWebsocket()
   const [pageBannerState, setPageBannerState] = useState({ loading: true, banner: null, error: null })
 
   /**
@@ -21,14 +23,16 @@ export const PageBanner = (props) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'X-App-X': ordering.appId
+          'X-App-X': ordering.appId,
+          'X-Socket-Id-X': socket?.getId()
         }
       }
       const response = await fetch(`${ordering.root}/banner?position=${position}`, requestOptions)
       const { error, result } = await response.json()
+      const totalItems = result.reduce((items, banner) => [...items, ...banner?.items], [])
       setPageBannerState({
         loading: false,
-        banner: error ? null : result,
+        banner: error ? null : { items: totalItems },
         error: error ? result : null
       })
     } catch (error) {
