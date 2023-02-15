@@ -20,7 +20,8 @@ export const LoginForm = (props) => {
     urlToRedirect,
     allowedLevels,
     handleCustomLogin,
-    notificationState
+    notificationState,
+    isGuest
   } = props
 
   const [ordering] = useApi()
@@ -40,7 +41,7 @@ export const LoginForm = (props) => {
   const useLoginOtpCellphone = configs?.otp_cellphone_enabled?.value === '1'
   const useLoginByEmail = (useLoginByCellphone || useLoginOtpEmail || useLoginOtpCellphone)
     ? configs?.email_password_login_enabled?.value === '1' : true
-
+  const useLoginSpoonity = configs?.spoonity_enabled?.value === '1'
   const useLoginOtp = useLoginOtpEmail || useLoginOtpCellphone
 
   defaultLoginTab = useLoginByEmail ? 'email' : useLoginByCellphone ? 'cellphone' : 'otp'
@@ -48,7 +49,7 @@ export const LoginForm = (props) => {
   const [otpType, setOtpType] = useState((!useLoginOtpEmail && useLoginOtpCellphone) ? 'cellphone' : 'email')
   const [otpState, setOtpState] = useState('')
 
-  const [, { login, logout }] = useSession()
+  const [{ user }, { login, logout }] = useSession()
   const [, t] = useLanguage()
 
   /**
@@ -108,6 +109,8 @@ export const LoginForm = (props) => {
         _credentials.notification_app = notificationState.notification_app
         _credentials.notification_token = notificationState.notification_token
       }
+
+      if (isGuest && user?.guest_id) _credentials.guest_token = user?.guest_id
 
       const { content: { error, result } } = await ordering.users().auth(_credentials)
 
@@ -342,6 +345,55 @@ export const LoginForm = (props) => {
     }
   }
 
+  const handleLoginSpoonity = async () => {
+    try {
+      setFormState({
+        ...formState,
+        loading: true
+      })
+      const response = await fetch(`${ordering.root}/auth/spoonity`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password
+        })
+      })
+      const { result, error } = await response.json()
+      if (error) {
+        setFormState({
+          result: {
+            error: true,
+            result: result
+          },
+          loading: false
+        })
+        return
+      }
+      login({
+        user: result,
+        token: result?.session?.access_token
+      })
+      setFormState({
+        result: {
+          error,
+          result
+        },
+        loading: false
+      })
+    } catch (err) {
+      setFormState({
+        result: {
+          error: true,
+          result: err.message
+        },
+        loading: false
+      })
+    }
+  }
+
   return (
     <>
       {UIComponent && (
@@ -370,6 +422,8 @@ export const LoginForm = (props) => {
           useLoginByCellphone={useLoginByCellphone}
           useLoginOtpEmail={useLoginOtpEmail}
           useLoginOtpCellphone={useLoginOtpCellphone}
+          useLoginSpoonity={useLoginSpoonity}
+          handleLoginSpoonity={handleLoginSpoonity}
         />
       )}
     </>
