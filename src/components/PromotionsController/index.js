@@ -7,7 +7,8 @@ import { useWebsocket } from '../../contexts/WebsocketContext'
 export const PromotionsController = (props) => {
   const {
     UIComponent,
-    paramsToFetch
+    paramsToFetch,
+    franchiseId
   } = props
 
   const [session] = useSession()
@@ -22,11 +23,14 @@ export const PromotionsController = (props) => {
     error: null,
     offers: []
   })
+  const location = JSON.stringify(options?.address?.location)
 
   const getOffers = async () => {
-    const location = JSON.stringify(options?.address?.location)
-    const url = `${ordering.root}/offers/public?enabled=true&params=${paramsToFetch.join()}&location=${location}`
-
+    let params = `?enabled=true&params=${paramsToFetch.join()}&location=${location}&order_type_id=${options?.type}`
+    if (franchiseId) {
+      params = params + `&franchise_id=${franchiseId}`
+    }
+    const url = `${ordering.root}/offers/public${params}`
     const response = await fetch(url, {
       method: 'GET',
       headers: {
@@ -64,7 +68,7 @@ export const PromotionsController = (props) => {
 
   useEffect(() => {
     loadOffers()
-  }, [])
+  }, [JSON.stringify(location), options?.type])
 
   return (
     <>
