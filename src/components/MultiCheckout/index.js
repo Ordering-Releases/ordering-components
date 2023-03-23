@@ -98,6 +98,9 @@ export const MultiCheckout = (props) => {
       setPlacing(false)
       if (!error) {
         onPlaceOrderClick && onPlaceOrderClick(result)
+      } else {
+        setPlacing(false)
+        onPlaceOrderClick && onPlaceOrderClick(result)
       }
     }
   }

@@ -198,6 +198,9 @@ var MultiCheckout = function MultiCheckout(props) {
             setPlacing(false);
             if (!error) {
               onPlaceOrderClick && onPlaceOrderClick(result);
+            } else {
+              setPlacing(false);
+              onPlaceOrderClick && onPlaceOrderClick(result);
             }
           case 24:
           case "end":
