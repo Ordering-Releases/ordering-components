@@ -33,8 +33,8 @@ export const CardForm = (props) => {
   const socket = useWebsocket()
   const stripe = useStripe()
   const elements = useElements()
-  const zipCodeRequired = validationFields?.checkout?.zipcode?.required
-  const zipCodeEnabled = validationFields?.checkout?.zipcode?.required
+  const zipCodeRequired = validationFields?.fields?.card?.zipcode?.required
+  const zipCodeEnabled = validationFields?.fields?.card?.zipcode?.required
 
   const [error, setError] = useState(null)
   const [errorExpiry, setErrorExpiry] = useState(null)
@@ -67,7 +67,11 @@ export const CardForm = (props) => {
       })
     })
     const response = await result.json()
-    isNewCard && onNewCard && onNewCard(response.result)
+    isNewCard && onNewCard && onNewCard({
+      ...response.result,
+      zipcode
+    })
+    setZipcode(null)
   }
 
   /**
@@ -116,9 +120,14 @@ export const CardForm = (props) => {
     }
     setLoading(true)
     event.preventDefault()
+    if (!zipcode && zipCodeRequired && zipCodeEnabled) {
+      setErrorZipcode(true)
+      setLoading(false)
+      return
+    }
     let card = elements?.getElement(CardElement)
     const userName = user?.lastname ? `${user?.name} ${user?.lastname}` : user?.name
-    const userAddress = user?.address && { line1: user?.address, postal_code: zipcode }
+    const userAddress = (user?.address || zipcode) && { line1: user?.address, postal_code: zipcode }
 
     const billingData = { email: user.email }
     userName && (billingData.name = userName)
@@ -150,6 +159,7 @@ export const CardForm = (props) => {
           id: result?.paymentMethod.id,
           type: 'card',
           card: {
+            zipcode,
             brand: result?.paymentMethod.card.brand,
             last4: result?.paymentMethod.card.last4
           }
@@ -159,10 +169,6 @@ export const CardForm = (props) => {
       if (!stripe) {
         setError(t('STRIPE_LOAD_ERROR', 'Faile to load Stripe properly'))
         return
-      }
-      if (!zipcode && zipCodeRequired && zipCodeEnabled) {
-        setErrorZipcode(true)
-        setLoading(false)
       }
       const result = await stripe.confirmCardSetup(
         requirements,
