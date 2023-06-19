@@ -204,6 +204,15 @@ var OrderListGroups = function OrderListGroups(props) {
                 }
               });
             }
+            if (filtered !== null && filtered !== void 0 && filtered.external_id) {
+              options.query.where.push({
+                attribute: 'external_id',
+                value: {
+                  condition: 'ilike',
+                  value: isIos ? "%".concat(filtered === null || filtered === void 0 ? void 0 : filtered.external_id, "%") : encodeURI("%".concat(filtered === null || filtered === void 0 ? void 0 : filtered.external_id, "%"))
+                }
+              });
+            }
             if (filtered !== null && filtered !== void 0 && filtered.state) {
               options.query.where.push({
                 attribute: 'status',
@@ -220,24 +229,24 @@ var OrderListGroups = function OrderListGroups(props) {
               });
             }
             if (!(filtered !== null && filtered !== void 0 && filtered.paymethod || customPaymethods)) {
-              _context.next = 14;
+              _context.next = 15;
               break;
             }
             paymethodResult = controlsState;
             if (controlsState.paymethods.length) {
-              _context.next = 13;
+              _context.next = 14;
               break;
             }
-            _context.next = 12;
+            _context.next = 13;
             return getControls();
-          case 12:
-            paymethodResult = _context.sent;
           case 13:
+            paymethodResult = _context.sent;
+          case 14:
             options.query.where.push({
               attribute: 'paymethod_id',
               value: !!(filtered !== null && filtered !== void 0 && filtered.paymethod) && (filtered === null || filtered === void 0 ? void 0 : filtered.paymethod) || ((_paymethodResult = paymethodResult) === null || _paymethodResult === void 0 ? void 0 : _paymethodResult.paymethods)
             });
-          case 14:
+          case 15:
             if (filtered !== null && filtered !== void 0 && filtered.driver) {
               options.query.where.push({
                 attribute: 'driver_id',
@@ -309,11 +318,11 @@ var OrderListGroups = function OrderListGroups(props) {
             requestsState.orders = source;
             options.cancelToken = source;
             functionFetch = asDashboard ? ordering.setAccessToken(accessToken).orders().asDashboard() : ordering.setAccessToken(accessToken).orders();
-            _context.next = 27;
+            _context.next = 28;
             return functionFetch.get(options);
-          case 27:
-            return _context.abrupt("return", _context.sent);
           case 28:
+            return _context.abrupt("return", _context.sent);
+          case 29:
           case "end":
             return _context.stop();
         }
@@ -1194,7 +1203,7 @@ var OrderListGroups = function OrderListGroups(props) {
   }, [filtered]);
   (0, _react.useEffect)(function () {
     var _ordersGroup$currentT19, _session$user7, _session$user8;
-    if ((_ordersGroup$currentT19 = ordersGroup[currentTabSelected]) !== null && _ordersGroup$currentT19 !== void 0 && _ordersGroup$currentT19.loading) return;
+    if ((_ordersGroup$currentT19 = ordersGroup[currentTabSelected]) !== null && _ordersGroup$currentT19 !== void 0 && _ordersGroup$currentT19.loading || !(socket !== null && socket !== void 0 && socket.socket)) return;
     var handleUpdateOrder = function handleUpdateOrder(order) {
       var _session$user5, _orderFound, _orderFound$driver, _order$driver, _session$user6;
       if ((session === null || session === void 0 ? void 0 : (_session$user5 = session.user) === null || _session$user5 === void 0 ? void 0 : _session$user5.level) === 2 && businessIDs.length > 0 && !businessIDs.includes(order.business_id)) return;
@@ -1263,11 +1272,14 @@ var OrderListGroups = function OrderListGroups(props) {
     socket.on('update_order', handleUpdateOrder);
     var ordersRoom = (session === null || session === void 0 ? void 0 : (_session$user7 = session.user) === null || _session$user7 === void 0 ? void 0 : _session$user7.level) === 0 ? 'orders' : "orders_".concat(session === null || session === void 0 ? void 0 : (_session$user8 = session.user) === null || _session$user8 === void 0 ? void 0 : _session$user8.id);
     socket.join(ordersRoom);
+    socket.socket.on('connect', function () {
+      socket.join(ordersRoom);
+    });
     return function () {
       socket.off('orders_register', handleAddNewOrder);
       socket.off('update_order', handleUpdateOrder);
     };
-  }, [ordersGroup, socket, session]);
+  }, [ordersGroup, socket === null || socket === void 0 ? void 0 : socket.socket, session]);
   var handleAddAssignRequest = (0, _react.useCallback)(function (order) {
     var _order$order$id3, _order$order4;
     setlogisticOrders(_objectSpread(_objectSpread({}, logisticOrders), {}, {

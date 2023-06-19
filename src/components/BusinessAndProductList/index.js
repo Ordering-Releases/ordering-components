@@ -286,7 +286,7 @@ export const BusinessAndProductList = (props) => {
     setErrorQuantityProducts(!categoryState.products?.length)
     setCategoryState({ ...categoryState })
   }
-
+  
   const getLazyProducts = async ({ page, pageSize = categoryStateDefault.pagination.pageSize }) => {
     const parameters = {
       type: orderState.options?.type ?? 1,
