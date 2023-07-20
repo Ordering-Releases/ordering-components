@@ -913,6 +913,7 @@ export const OrderListGroups = (props) => {
     socket.join(ordersRoom)
     socket.socket.on('connect', () => {
       socket.join(ordersRoom)
+      loadOrders({ newFetch: true })
     })
     return () => {
       socket.off('orders_register', handleAddNewOrder)
@@ -1025,6 +1026,20 @@ export const OrderListGroups = (props) => {
       events.off('customer_reviewed', handleCustomerReviewed)
     }
   }, [ordersGroup])
+
+  useEffect(() => {
+    if (socket?.socket && session?.auth) {
+      socket.socket.on('connect', () => {
+        loadOrders({ newFetch: true })
+      })
+    }
+
+    return () => {
+      if (socket?.socket) {
+        socket.socket.off('connect')
+      }
+    }
+  }, [socket?.socket, session.auth])
 
   return (
     <>

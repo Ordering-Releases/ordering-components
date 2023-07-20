@@ -1279,6 +1279,9 @@ var OrderListGroups = function OrderListGroups(props) {
     socket.join(ordersRoom);
     socket.socket.on('connect', function () {
       socket.join(ordersRoom);
+      loadOrders({
+        newFetch: true
+      });
     });
     return function () {
       socket.off('orders_register', handleAddNewOrder);
@@ -1389,6 +1392,20 @@ var OrderListGroups = function OrderListGroups(props) {
       events.off('customer_reviewed', handleCustomerReviewed);
     };
   }, [ordersGroup]);
+  (0, _react.useEffect)(function () {
+    if (socket !== null && socket !== void 0 && socket.socket && session !== null && session !== void 0 && session.auth) {
+      socket.socket.on('connect', function () {
+        loadOrders({
+          newFetch: true
+        });
+      });
+    }
+    return function () {
+      if (socket !== null && socket !== void 0 && socket.socket) {
+        socket.socket.off('connect');
+      }
+    };
+  }, [socket === null || socket === void 0 ? void 0 : socket.socket, session.auth]);
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, UIComponent && /*#__PURE__*/_react.default.createElement(UIComponent, _extends({}, props, {
     currentFilters: currentFilters,
     setCurrentFilters: setCurrentFilters,
