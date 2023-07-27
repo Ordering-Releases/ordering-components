@@ -4,11 +4,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" =
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ExportCSV = void 0;
+exports.GiftCardOrdersList = void 0;
 var _react = _interopRequireWildcard(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
-var _ApiContext = require("../../../contexts/ApiContext");
 var _SessionContext = require("../../../contexts/SessionContext");
+var _ApiContext = require("../../../contexts/ApiContext");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -27,46 +27,71 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i.return && (_r = _i.return(), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-var ExportCSV = function ExportCSV(props) {
+var GiftCardOrdersList = function GiftCardOrdersList(props) {
+  var _paginationSettings$p;
   var UIComponent = props.UIComponent,
-    filterValues = props.filterValues,
-    franchiseId = props.franchiseId;
+    paginationSettings = props.paginationSettings,
+    defaultStatus = props.defaultStatus;
   var _useApi = (0, _ApiContext.useApi)(),
     _useApi2 = _slicedToArray(_useApi, 1),
     ordering = _useApi2[0];
   var _useSession = (0, _SessionContext.useSession)(),
     _useSession2 = _slicedToArray(_useSession, 1),
-    _useSession2$ = _useSession2[0],
-    token = _useSession2$.token,
-    loading = _useSession2$.loading;
+    token = _useSession2[0].token;
   var _useState = (0, _react.useState)({
-      loading: false,
-      error: null,
-      result: null
+      loading: true,
+      list: [],
+      error: null
     }),
     _useState2 = _slicedToArray(_useState, 2),
-    actionStatus = _useState2[0],
-    setActionStatus = _useState2[1];
+    giftCards = _useState2[0],
+    setGiftCards = _useState2[1];
+  var _useState3 = (0, _react.useState)({
+      currentPage: paginationSettings.initialPage && paginationSettings.initialPage >= 1 ? paginationSettings.initialPage - 1 : 0,
+      pageSize: (_paginationSettings$p = paginationSettings.pageSize) !== null && _paginationSettings$p !== void 0 ? _paginationSettings$p : 10,
+      totalItems: null,
+      totalPages: null
+    }),
+    _useState4 = _slicedToArray(_useState3, 2),
+    paginationProps = _useState4[0],
+    setPaginationProps = _useState4[1];
+  var _useState5 = (0, _react.useState)(defaultStatus || null),
+    _useState6 = _slicedToArray(_useState5, 2),
+    activeStatus = _useState6[0],
+    setActiveStatus = _useState6[1];
 
   /**
-   * Method to get csv from API
+   * Method to get the gift cards from API
    */
-  var getCSV = /*#__PURE__*/function () {
-    var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(filterApply) {
-      var requestOptions, filterConditons, functionFetch, response, _yield$response$json, error, result;
+  var getGiftCards = /*#__PURE__*/function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(page) {
+      var pageSize,
+        where,
+        conditions,
+        requestOptions,
+        fetchEndpoint,
+        _args = arguments;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
-            if (!loading) {
-              _context.next = 2;
-              break;
-            }
-            return _context.abrupt("return");
-          case 2:
-            _context.prev = 2;
-            setActionStatus(_objectSpread(_objectSpread({}, actionStatus), {}, {
+            pageSize = _args.length > 1 && _args[1] !== undefined ? _args[1] : paginationProps.pageSize;
+            setGiftCards(_objectSpread(_objectSpread({}, giftCards), {}, {
               loading: true
             }));
+            where = null;
+            conditions = [];
+            if (activeStatus) {
+              conditions.push({
+                attribute: 'status',
+                value: activeStatus
+              });
+            }
+            if (conditions.length) {
+              where = {
+                conditions: conditions,
+                conector: 'AND'
+              };
+            }
             requestOptions = {
               method: 'GET',
               headers: {
@@ -74,163 +99,153 @@ var ExportCSV = function ExportCSV(props) {
                 Authorization: "Bearer ".concat(token)
               }
             };
-            filterConditons = [];
-            if (franchiseId) {
-              filterConditons.push({
-                attribute: 'ref_business',
-                conditions: [{
-                  attribute: 'franchise_id',
-                  value: franchiseId
-                }]
-              });
-            }
-            if (filterApply) {
-              if (Object.keys(filterValues).length) {
-                if (filterValues.statuses !== undefined) {
-                  if (filterValues.statuses.length > 0) {
-                    filterConditons.push({
-                      attribute: 'status',
-                      value: filterValues.statuses
-                    });
-                  } else {
-                    filterConditons.push({
-                      attribute: 'status',
-                      value: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-                    });
-                  }
-                }
-                if (filterValues.deliveryFromDatetime !== undefined) {
-                  if (filterValues.deliveryFromDatetime !== null) {
-                    filterConditons.push({
-                      attribute: 'delivery_datetime',
-                      value: {
-                        condition: '>=',
-                        value: encodeURI(filterValues.deliveryFromDatetime)
-                      }
-                    });
-                  }
-                }
-                if (filterValues.deliveryEndDatetime !== undefined) {
-                  if (filterValues.deliveryEndDatetime !== null) {
-                    filterConditons.push({
-                      attribute: 'delivery_datetime',
-                      value: {
-                        condition: '<=',
-                        value: filterValues.deliveryEndDatetime
-                      }
-                    });
-                  }
-                }
-                if (filterValues.businessIds !== undefined) {
-                  if (filterValues.businessIds.length !== 0) {
-                    filterConditons.push({
-                      attribute: 'business_id',
-                      value: filterValues.businessIds
-                    });
-                  }
-                }
-                if (filterValues.driverIds !== undefined) {
-                  if (filterValues.driverIds.length !== 0) {
-                    filterConditons.push({
-                      attribute: 'driver_id',
-                      value: filterValues.driverIds
-                    });
-                  }
-                }
-                if (filterValues.deliveryTypes !== undefined) {
-                  if (filterValues.deliveryTypes.length !== 0) {
-                    filterConditons.push({
-                      attribute: 'delivery_type',
-                      value: filterValues.deliveryTypes
-                    });
-                  }
-                }
-                if (filterValues.paymethodIds !== undefined) {
-                  if (filterValues.paymethodIds.length !== 0) {
-                    filterConditons.push({
-                      attribute: 'paymethod_id',
-                      value: filterValues.paymethodIds
-                    });
-                  }
-                }
-              }
-            }
-            functionFetch = filterApply || franchiseId ? "".concat(ordering.root, "/orders.csv?mode=dashboard&orderBy=id&where=").concat(JSON.stringify(filterConditons)) : "".concat(ordering.root, "/orders.csv?mode=dashboard&orderBy=id");
-            _context.next = 11;
-            return fetch(functionFetch, requestOptions);
+            fetchEndpoint = where ? "".concat(ordering.root, "/gift_cards?orderBy=-id&&page=").concat(page, "&page_size=").concat(pageSize, "&&where=").concat(JSON.stringify(where)) : "".concat(ordering.root, "/gift_cards?orderBy=-id&&page=").concat(page, "&page_size=").concat(pageSize);
+            _context.next = 10;
+            return fetch(fetchEndpoint, requestOptions);
+          case 10:
+            return _context.abrupt("return", _context.sent);
           case 11:
-            response = _context.sent;
-            _context.next = 14;
-            return response.json();
-          case 14:
-            _yield$response$json = _context.sent;
-            error = _yield$response$json.error;
-            result = _yield$response$json.result;
-            if (!error) {
-              setActionStatus(_objectSpread(_objectSpread({}, actionStatus), {}, {
-                loading: false,
-                result: result
-              }));
-            } else {
-              setActionStatus(_objectSpread(_objectSpread({}, actionStatus), {}, {
-                loading: true,
-                error: result
-              }));
-            }
-            _context.next = 23;
-            break;
-          case 20:
-            _context.prev = 20;
-            _context.t0 = _context["catch"](2);
-            setActionStatus(_objectSpread(_objectSpread({}, actionStatus), {}, {
-              loading: false,
-              error: _context.t0
-            }));
-          case 23:
           case "end":
             return _context.stop();
         }
-      }, _callee, null, [[2, 20]]);
+      }, _callee);
     }));
-    return function getCSV(_x2) {
+    return function getGiftCards(_x2) {
       return _ref.apply(this, arguments);
     };
   }();
+  var loadMoreOrders = /*#__PURE__*/function () {
+    var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      var response, _yield$response$json, error, result, pagination;
+      return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+        while (1) switch (_context2.prev = _context2.next) {
+          case 0:
+            setGiftCards(_objectSpread(_objectSpread({}, giftCards), {}, {
+              loading: true
+            }));
+            _context2.prev = 1;
+            _context2.next = 4;
+            return getGiftCards(paginationProps.currentPage + 1);
+          case 4:
+            response = _context2.sent;
+            _context2.next = 7;
+            return response.json();
+          case 7:
+            _yield$response$json = _context2.sent;
+            error = _yield$response$json.error;
+            result = _yield$response$json.result;
+            pagination = _yield$response$json.pagination;
+            if (!error) {
+              setPaginationProps({
+                currentPage: pagination.current_page,
+                pageSize: pagination.page_size === 0 ? paginationProps.pageSize : pagination.page_size,
+                totalPages: pagination.total_pages,
+                totalItems: pagination.total,
+                from: pagination.from,
+                to: pagination.to
+              });
+            }
+            setGiftCards({
+              loading: false,
+              list: error ? giftCards.list : giftCards.list.concat(result),
+              error: error ? result : null
+            });
+            _context2.next = 18;
+            break;
+          case 15:
+            _context2.prev = 15;
+            _context2.t0 = _context2["catch"](1);
+            setGiftCards(_objectSpread(_objectSpread({}, giftCards), {}, {
+              loading: false,
+              error: [_context2.t0.message]
+            }));
+          case 18:
+          case "end":
+            return _context2.stop();
+        }
+      }, _callee2, null, [[1, 15]]);
+    }));
+    return function loadMoreOrders() {
+      return _ref2.apply(this, arguments);
+    };
+  }();
+  var goToPage = /*#__PURE__*/function () {
+    var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(page) {
+      var response, _yield$response$json2, error, result, pagination;
+      return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+        while (1) switch (_context3.prev = _context3.next) {
+          case 0:
+            setGiftCards(_objectSpread(_objectSpread({}, giftCards), {}, {
+              loading: true
+            }));
+            _context3.prev = 1;
+            _context3.next = 4;
+            return getGiftCards(page);
+          case 4:
+            response = _context3.sent;
+            _context3.next = 7;
+            return response.json();
+          case 7:
+            _yield$response$json2 = _context3.sent;
+            error = _yield$response$json2.error;
+            result = _yield$response$json2.result;
+            pagination = _yield$response$json2.pagination;
+            if (!error) {
+              setPaginationProps({
+                currentPage: pagination.current_page,
+                pageSize: pagination.page_size === 0 ? paginationProps.pageSize : pagination.page_size,
+                totalPages: pagination.total_pages,
+                totalItems: pagination.total,
+                from: pagination.from,
+                to: pagination.to
+              });
+            }
+            setGiftCards({
+              loading: false,
+              list: error ? [] : result,
+              error: error ? result : null
+            });
+            _context3.next = 18;
+            break;
+          case 15:
+            _context3.prev = 15;
+            _context3.t0 = _context3["catch"](1);
+            setGiftCards(_objectSpread(_objectSpread({}, giftCards), {}, {
+              loading: false,
+              error: [_context3.t0.message]
+            }));
+          case 18:
+          case "end":
+            return _context3.stop();
+        }
+      }, _callee3, null, [[1, 15]]);
+    }));
+    return function goToPage(_x3) {
+      return _ref3.apply(this, arguments);
+    };
+  }();
+  (0, _react.useEffect)(function () {
+    goToPage(1);
+  }, []);
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, UIComponent && /*#__PURE__*/_react.default.createElement(UIComponent, _extends({}, props, {
-    actionStatus: actionStatus,
-    getCSV: getCSV
+    giftCards: giftCards,
+    paginationProps: paginationProps,
+    activeStatus: activeStatus,
+    setActiveStatus: setActiveStatus,
+    loadMoreOrders: loadMoreOrders,
+    goToPage: goToPage
   })));
 };
-exports.ExportCSV = ExportCSV;
-ExportCSV.propTypes = {
+exports.GiftCardOrdersList = GiftCardOrdersList;
+GiftCardOrdersList.propTypes = {
   /**
-   * UI Component, this must be containt all graphic elements and use parent props
-   */
-  UIComponent: _propTypes.default.elementType,
-  /**
-   * Components types before my orders
-   * Array of type components, the parent props will pass to these components
-   */
-  beforeComponents: _propTypes.default.arrayOf(_propTypes.default.elementType),
-  /**
-   * Components types after my orders
-   * Array of type components, the parent props will pass to these components
-   */
-  afterComponents: _propTypes.default.arrayOf(_propTypes.default.elementType),
-  /**
-   * Elements before my orders
-   * Array of HTML/Components elements, these components will not get the parent props
-   */
-  beforeElements: _propTypes.default.arrayOf(_propTypes.default.element),
-  /**
-   * Elements after my orders
-   * Array of HTML/Components elements, these components will not get the parent props
-   */
-  afterElements: _propTypes.default.arrayOf(_propTypes.default.element)
+  * UI Component, this must be containt all graphic elements and use parent props
+  */
+  UIComponent: _propTypes.default.elementType
 };
-ExportCSV.defaultProps = {
-  beforeComponents: [],
-  afterComponents: [],
-  beforeElements: [],
-  afterElements: []
+GiftCardOrdersList.defaultProps = {
+  paginationSettings: {
+    initialPage: 1,
+    pageSize: 10
+  }
 };
