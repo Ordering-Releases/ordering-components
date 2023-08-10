@@ -21,14 +21,15 @@ export const AddressForm = (props) => {
   const [validationFields] = useValidationFields()
   const [addressState, setAddressState] = useState({ loading: false, error: null, address: address || {} })
   const [formState, setFormState] = useState({ loading: false, changes: {}, error: null })
-  const [{ auth, user, token }] = useSession()
+  const [{ auth, user, token }, { refreshUserInfo }] = useSession()
   const requestsState = {}
-  const [, { changeAddress }] = useOrder()
+  const [{ options }, { changeAddress }] = useOrder()
   const userId = props.userId || user?.id
   const accessToken = props.accessToken || token
   const [, { setUserCustomer }] = useCustomer()
 
   const [isEdit, setIsEdit] = useState(false)
+  const [businessesList, setBusinessesList] = useState({ businesses: [], loading: true, error: null })
 
   /**
    * Load an address by id
@@ -148,6 +149,7 @@ export const AddressForm = (props) => {
           })
         }
       }
+      refreshUserInfo()
     } catch (err) {
       setFormState({
         ...formState,
@@ -155,6 +157,60 @@ export const AddressForm = (props) => {
         error: [err.message],
         address: {}
       })
+    }
+  }
+
+  const getBusinessDeliveryZones = async (location) => {
+    try {
+      setBusinessesList({
+        ...businessesList,
+        loading: true,
+        businesses: []
+      })
+      let where = null
+      const conditions = []
+      const parameters = {
+        location,
+        type: options?.type
+      }
+      conditions.push({
+        attribute: 'types',
+        conditions: [{
+          attribute: 'id',
+          value: options?.type
+        }]
+      })
+      where = {
+        conditions,
+        conector: 'AND'
+      }
+      const source = {}
+      requestsState.businesses = source
+      const fetchEndpoint = ordering.businesses().select(['delivery_zone', 'name', 'id', 'location', 'logo', 'slug', 'zones']).parameters(parameters).where(where)
+      const { content: { error, result } } = await fetchEndpoint.get({ cancelToken: source })
+      setBusinessesList({
+        ...businessesList,
+        loading: false,
+        error,
+        businesses: result.map(business => ({
+          ...business?.location,
+          icon: business?.logo,
+          slug: business?.slug,
+          zones: business?.zones
+        })),
+        result,
+        fetched: true
+      })
+    } catch (err) {
+      if (err.constructor.name !== 'Cancel') {
+        setBusinessesList({
+          ...businessesList,
+          loading: false,
+          error: true,
+          fetched: true,
+          result: [err.message]
+        })
+      }
     }
   }
 
@@ -179,6 +235,16 @@ export const AddressForm = (props) => {
     }
   }, [])
 
+  /**
+ * Cancel businesses request
+ */
+  useEffect(() => {
+    const request = requestsState.businesses
+    return () => {
+      request && request.cancel()
+    }
+  }, [requestsState.businesses])
+
   return (
     <>
       {
@@ -193,6 +259,8 @@ export const AddressForm = (props) => {
             saveAddress={saveAddress}
             addressState={addressState}
             setIsEdit={(val) => setIsEdit(val)}
+            businessesList={businessesList}
+            getBusinessDeliveryZones={getBusinessDeliveryZones}
           />
         )
       }
