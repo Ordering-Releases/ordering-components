@@ -1,6 +1,6 @@
 {
   "name": "ordering-components-external",
-  "version": "9.7.2",
+  "version": "9.7.3",
   "description": "Ordering Internal Dashboard",
   "main": "./_modules/index.js",
   "scripts": {
@@ -66,7 +66,7 @@
     "prop-types": "^15.7.2",
     "react-google-recaptcha": "latest",
     "react-google-recaptcha-v3": "^1.10.0",
-    "socket.io-client": "^4.7.2"  
+    "socket.io-client": "^4.7.2"
   },
   "peerDependencies": {
     "react": ">=16.13.1",
