@@ -42,7 +42,8 @@ var WebsocketProvider = function WebsocketProvider(_ref) {
   var _session$user;
   var settings = _ref.settings,
     children = _ref.children,
-    strategy = _ref.strategy;
+    strategy = _ref.strategy,
+    isAlsea = _ref.isAlsea;
   var _useSession = (0, _SessionContext.useSession)(),
     _useSession2 = _slicedToArray(_useSession, 1),
     session = _useSession2[0];
@@ -59,7 +60,7 @@ var WebsocketProvider = function WebsocketProvider(_ref) {
     if (configs.project) {
       var _socket = new _socket2.Socket(_objectSpread(_objectSpread({}, configs), {}, {
         accessToken: session.token,
-        url: 'https://socket-v3.ordering.co'
+        url: isAlsea ? configs.url : 'https://socket-v3.ordering.co'
       }));
       setSocket(_socket);
     }
@@ -122,10 +123,12 @@ var WebsocketProvider = function WebsocketProvider(_ref) {
         return socket.socket.connect();
       }, 1000);
     });
-    socket.socket.on('connect_error', function () {
-      connectionErrorTimeout = setTimeout(function () {
-        return socket.socket.connect();
-      }, 1000);
+    socket.socket.on('connect_error', function (error) {
+      if (error.message !== 'invalid signature') {
+        connectionErrorTimeout = setTimeout(function () {
+          return socket.socket.connect();
+        }, 1000);
+      }
     });
     return function () {
       clearInterval(disconnectTimeout);
