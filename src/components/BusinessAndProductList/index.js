@@ -288,7 +288,7 @@ export const BusinessAndProductList = (props) => {
     setErrorQuantityProducts(!categoryState.products?.length)
     setCategoryState({ ...categoryState })
   }
-
+  
   const getLazyProducts = async ({ page, pageSize = categoryStateDefault.pagination.pageSize }) => {
     const parameters = {
       type: orderState.options?.type ?? 1,
@@ -801,7 +801,7 @@ export const BusinessAndProductList = (props) => {
             }
           }
           return product
-        })
+        }) 
         setCategoryState({ ...categoryState, products: updatedProducts })
         showToast(ToastType.Success, result?.enabled
           ? t('ENABLED_PRODUCT', 'Enabled product')
@@ -813,7 +813,7 @@ export const BusinessAndProductList = (props) => {
       showToast(ToastType.Error, err.message)
     }
   }
-
+  
 
   const updateStoreCategory = async (categoryId, updateParams = {}) => {
     try {

@@ -704,18 +704,12 @@ var OrderListGroups = function OrderListGroups(props) {
       return _regeneratorRuntime().wrap(function _callee7$(_context7) {
         while (1) switch (_context7.prev = _context7.next) {
           case 0:
-            if (!isAlreadyFetched) {
-              _context7.next = 2;
-              break;
-            }
-            return _context7.abrupt("return");
-          case 2:
-            _context7.prev = 2;
+            _context7.prev = 0;
             setlogisticOrders(_objectSpread(_objectSpread({}, logisticOrders), {}, {
               loading: true
             }));
             url = "".concat(ordering.root, "/drivers/").concat((_session$user = session.user) === null || _session$user === void 0 ? void 0 : _session$user.id, "/assign_requests");
-            _context7.next = 7;
+            _context7.next = 5;
             return fetch(url, {
               method: 'GET',
               headers: {
@@ -725,16 +719,16 @@ var OrderListGroups = function OrderListGroups(props) {
                 'X-Socket-Id-X': socket === null || socket === void 0 ? void 0 : socket.getId()
               }
             });
-          case 7:
+          case 5:
             response = _context7.sent;
-            _context7.next = 10;
+            _context7.next = 8;
             return response.json();
-          case 10:
+          case 8:
             _yield$response$json2 = _context7.sent;
             result = _yield$response$json2.result;
             error = _yield$response$json2.error;
             if (error) {
-              _context7.next = 16;
+              _context7.next = 14;
               break;
             }
             setlogisticOrders(_objectSpread(_objectSpread({}, logisticOrders), {}, {
@@ -745,27 +739,27 @@ var OrderListGroups = function OrderListGroups(props) {
               })
             }));
             return _context7.abrupt("return");
-          case 16:
+          case 14:
             setlogisticOrders({
               loading: false,
               orders: [],
               error: result
             });
-            _context7.next = 22;
+            _context7.next = 20;
             break;
-          case 19:
-            _context7.prev = 19;
-            _context7.t0 = _context7["catch"](2);
+          case 17:
+            _context7.prev = 17;
+            _context7.t0 = _context7["catch"](0);
             setlogisticOrders({
               loading: false,
               orders: [],
               error: _context7.t0.message
             });
-          case 22:
+          case 20:
           case "end":
             return _context7.stop();
         }
-      }, _callee7, null, [[2, 19]]);
+      }, _callee7, null, [[0, 17]]);
     }));
     return function loadLogisticOrders(_x5) {
       return _ref9.apply(this, arguments);
@@ -1229,8 +1223,8 @@ var OrderListGroups = function OrderListGroups(props) {
     if ((_ordersGroup$currentT14 = ordersGroup[currentTabSelected]) !== null && _ordersGroup$currentT14 !== void 0 && _ordersGroup$currentT14.loading || !(socket !== null && socket !== void 0 && socket.socket)) return;
     var handleUpdateOrder = function handleUpdateOrder(order) {
       var _session$user5, _orderFound, _order$driver, _session$user6;
-      handleActionEvent('update_order', order);
       if ((session === null || session === void 0 || (_session$user5 = session.user) === null || _session$user5 === void 0 ? void 0 : _session$user5.level) === 2 && businessIDs.length > 0 && !businessIDs.includes(order.business_id)) return;
+      handleActionEvent('update_order', order);
       events.emit('order_updated', order);
       var orderFound = null;
       for (var i = 0; i < ordersStatusArray.length; i++) {
@@ -1300,11 +1294,8 @@ var OrderListGroups = function OrderListGroups(props) {
     });
     var ordersRoom = (session === null || session === void 0 || (_session$user7 = session.user) === null || _session$user7 === void 0 ? void 0 : _session$user7.level) === 0 ? 'orders' : "orders_".concat(session === null || session === void 0 || (_session$user8 = session.user) === null || _session$user8 === void 0 ? void 0 : _session$user8.id);
     socket.join(ordersRoom);
-    socket.socket.on('connect', function () {
+    socket.socket && socket.socket.on('connect', function () {
       socket.join(ordersRoom);
-      loadOrders({
-        newFetch: true
-      });
     });
     return function () {
       socket.off('orders_register', handleAddNewOrder);
@@ -1317,11 +1308,19 @@ var OrderListGroups = function OrderListGroups(props) {
   var handleAddAssignRequest = (0, _react.useCallback)(function (order) {
     var _order$order$id3, _order$order4;
     handleActionEvent('request_register', order);
-    setlogisticOrders(_objectSpread(_objectSpread({}, logisticOrders), {}, {
-      orders: sortOrders([].concat(_toConsumableArray(logisticOrders === null || logisticOrders === void 0 ? void 0 : logisticOrders.orders), [order]))
-    }));
+    setlogisticOrders(function (prevState) {
+      return _objectSpread(_objectSpread({}, prevState), {}, {
+        orders: sortOrders([].concat(_toConsumableArray(prevState === null || prevState === void 0 ? void 0 : prevState.orders), [order]).filter(function (order, index, hash) {
+          // remove possibles duplicates
+          var val = JSON.stringify(order);
+          return index === hash.findIndex(function (_order) {
+            return JSON.stringify(_order) === val;
+          });
+        }))
+      });
+    });
     showToast(_ToastContext.ToastType.Info, t('SPECIFIC_LOGISTIC_ORDER_ORDERED', 'Logisitc order _NUMBER_ has been ordered').replace('_NUMBER_', (_order$order$id3 = order === null || order === void 0 || (_order$order4 = order.order) === null || _order$order4 === void 0 ? void 0 : _order$order4.id) !== null && _order$order$id3 !== void 0 ? _order$order$id3 : order.id), 1000);
-  }, []);
+  }, [logisticOrders]);
   var handleDeleteAssignRequest = (0, _react.useCallback)(function (order) {
     setlogisticOrders(function (prevState) {
       var _prevState$orders, _prevState$orders2, _prevState$orders3;
@@ -1337,7 +1336,7 @@ var OrderListGroups = function OrderListGroups(props) {
         })])) : sortOrders(prevState === null || prevState === void 0 ? void 0 : prevState.orders)
       });
     });
-  }, []);
+  }, [logisticOrders]);
   var handleUpdateAssignRequest = (0, _react.useCallback)(function (order) {
     var _order$order$id4, _order$order5;
     handleActionEvent('request_update', order);
@@ -1354,7 +1353,7 @@ var OrderListGroups = function OrderListGroups(props) {
       });
     });
     showToast(_ToastContext.ToastType.Info, t('SPECIFIC_LOGISTIC_ORDER_UPDATED', 'Your logisitc order number _NUMBER_ has updated').replace('_NUMBER_', (_order$order$id4 = order === null || order === void 0 || (_order$order5 = order.order) === null || _order$order5 === void 0 ? void 0 : _order$order5.id) !== null && _order$order$id4 !== void 0 ? _order$order$id4 : order.id), 1000);
-  }, []);
+  }, [logisticOrders]);
   (0, _react.useEffect)(function () {
     if (isLogisticActivated) {
       socket.on('request_register', handleAddAssignRequest);
@@ -1424,22 +1423,6 @@ var OrderListGroups = function OrderListGroups(props) {
       events.off('customer_reviewed', handleCustomerReviewed);
     };
   }, [ordersGroup]);
-  (0, _react.useEffect)(function () {
-    if (socket !== null && socket !== void 0 && socket.socket && session !== null && session !== void 0 && session.auth) {
-      var _socket$socket;
-      socket === null || socket === void 0 || (_socket$socket = socket.socket) === null || _socket$socket === void 0 ? void 0 : _socket$socket.on('connect', function () {
-        loadOrders({
-          newFetch: true
-        });
-      });
-    }
-    return function () {
-      if (socket !== null && socket !== void 0 && socket.socket) {
-        var _socket$socket2;
-        socket === null || socket === void 0 || (_socket$socket2 = socket.socket) === null || _socket$socket2 === void 0 ? void 0 : _socket$socket2.off('connect');
-      }
-    };
-  }, [socket === null || socket === void 0 ? void 0 : socket.socket, session.auth]);
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, UIComponent && /*#__PURE__*/_react.default.createElement(UIComponent, _extends({}, props, {
     currentFilters: currentFilters,
     setCurrentFilters: setCurrentFilters,
