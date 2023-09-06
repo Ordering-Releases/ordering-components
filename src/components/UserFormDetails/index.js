@@ -48,7 +48,7 @@ export const UserFormDetails = (props) => {
       const source = {}
       requestsState.user = source
       ordering.setAccessToken(accessToken).users((useSessionUser && refreshSessionUser) ? session.user.id : userId).get({ cancelToken: source }).then((response) => {
-        setUserState({ loading: false, result: response.content })
+        setUserState({ loading: false, loadingDriver: false,result: response.content })
         if (response.content.result) {
           if (!isCustomerMode) {
             changeUser({
@@ -65,6 +65,7 @@ export const UserFormDetails = (props) => {
       }).catch((err) => {
         if (err.constructor.name !== 'Cancel') {
           setUserState({
+            loadingDriver: false,
             loading: false,
             result: {
               error: true,
@@ -76,6 +77,7 @@ export const UserFormDetails = (props) => {
     } else {
       setUserState({
         loading: false,
+        loadingDriver: false,
         result: {
           error: false,
           result: (useSessionUser && !refreshSessionUser) ? session.user : user
@@ -136,6 +138,7 @@ export const UserFormDetails = (props) => {
       if (!response.content.error) {
         setUserState({
           ...userState,
+          loadingDriver: false,
           result: {
             ...userState.result,
             ...response.content
@@ -339,6 +342,7 @@ export const UserFormDetails = (props) => {
       if (!response.content.error) {
         setUserState({
           ...userState,
+          loadingDriver: false,
           result: {
             ...userState.result,
             ...response.content
@@ -450,6 +454,32 @@ export const UserFormDetails = (props) => {
       singleNotifications?.loading ? singleNotifications : notificationsGroup
     )
   }, [notificationsGroup?.loading, singleNotifications?.loading])
+
+  useEffect(() => {
+    const handleUpdateDriver = (data) => {
+      const changes = {}
+      data.changes?.map(change => (
+        changes[change.attribute] = change.new
+      ))
+      setUserState({
+        ...userState,
+        loadingDriver: false,
+        result: {
+          ...userState?.result,
+          ...changes
+        }
+      })
+      changeUser({
+        ...session.user,
+        ...changes
+      })
+    }
+
+    socket.on('drivers_changes', handleUpdateDriver)
+    return () => {
+      socket.off('drivers_changes', handleUpdateDriver)
+    }
+  }, [socket?.socket])
 
   return (
     <>

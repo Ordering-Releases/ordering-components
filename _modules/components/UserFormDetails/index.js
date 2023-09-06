@@ -140,6 +140,7 @@ var UserFormDetails = function UserFormDetails(props) {
       }).then(function (response) {
         setUserState({
           loading: false,
+          loadingDriver: false,
           result: response.content
         });
         if (response.content.result) {
@@ -152,6 +153,7 @@ var UserFormDetails = function UserFormDetails(props) {
       }).catch(function (err) {
         if (err.constructor.name !== 'Cancel') {
           setUserState({
+            loadingDriver: false,
             loading: false,
             result: {
               error: true,
@@ -163,6 +165,7 @@ var UserFormDetails = function UserFormDetails(props) {
     } else {
       setUserState({
         loading: false,
+        loadingDriver: false,
         result: {
           error: false,
           result: useSessionUser && !refreshSessionUser ? session.user : user
@@ -240,6 +243,7 @@ var UserFormDetails = function UserFormDetails(props) {
           case 17:
             if (!response.content.error) {
               setUserState(_objectSpread(_objectSpread({}, userState), {}, {
+                loadingDriver: false,
                 result: _objectSpread(_objectSpread({}, userState.result), response.content)
               }));
               if (!isCustomerMode) {
@@ -469,6 +473,7 @@ var UserFormDetails = function UserFormDetails(props) {
             }));
             if (!response.content.error) {
               setUserState(_objectSpread(_objectSpread({}, userState), {}, {
+                loadingDriver: false,
                 result: _objectSpread(_objectSpread({}, userState.result), response.content)
               }));
               if (!isCustomerMode) {
@@ -605,6 +610,24 @@ var UserFormDetails = function UserFormDetails(props) {
   (0, _react.useEffect)(function () {
     updatePromotions(singleNotifications !== null && singleNotifications !== void 0 && singleNotifications.loading ? singleNotifications === null || singleNotifications === void 0 ? void 0 : singleNotifications.changes : notificationsGroup === null || notificationsGroup === void 0 ? void 0 : notificationsGroup.changes, singleNotifications !== null && singleNotifications !== void 0 && singleNotifications.loading ? setSingleNotifications : setNotificationsGroup, singleNotifications !== null && singleNotifications !== void 0 && singleNotifications.loading ? singleNotifications : notificationsGroup);
   }, [notificationsGroup === null || notificationsGroup === void 0 ? void 0 : notificationsGroup.loading, singleNotifications === null || singleNotifications === void 0 ? void 0 : singleNotifications.loading]);
+  (0, _react.useEffect)(function () {
+    var handleUpdateDriver = function handleUpdateDriver(data) {
+      var _data$changes;
+      var changes = {};
+      (_data$changes = data.changes) === null || _data$changes === void 0 || _data$changes.map(function (change) {
+        return changes[change.attribute] = change.new;
+      });
+      setUserState(_objectSpread(_objectSpread({}, userState), {}, {
+        loadingDriver: false,
+        result: _objectSpread(_objectSpread({}, userState === null || userState === void 0 ? void 0 : userState.result), changes)
+      }));
+      changeUser(_objectSpread(_objectSpread({}, session.user), changes));
+    };
+    socket.on('drivers_changes', handleUpdateDriver);
+    return function () {
+      socket.off('drivers_changes', handleUpdateDriver);
+    };
+  }, [socket === null || socket === void 0 ? void 0 : socket.socket]);
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, UIComponent && /*#__PURE__*/_react.default.createElement(UIComponent, _extends({}, props, {
     isEdit: isEdit,
     cleanFormState: cleanFormState,
