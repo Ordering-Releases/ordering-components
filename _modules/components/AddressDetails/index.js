@@ -28,7 +28,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
  * Component to manage address details behavior without UI component
  */
 var AddressDetails = function AddressDetails(props) {
-  var _configs$google_maps_, _Object$values$find$b, _Object$values$find;
+  var _configs$google_maps_, _Object$values$find$b, _Object$values$find, _ref, _orderState$options2;
   var apiKey = props.apiKey,
     UIComponent = props.UIComponent,
     mapConfigs = props.mapConfigs,
@@ -86,8 +86,8 @@ var AddressDetails = function AddressDetails(props) {
   /**
    * Method to get business location from API
    */
-  var getBusiness = /*#__PURE__*/function () {
-    var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+  var getBusiness = function getBusiness() {
+    return (_ref = _ref || _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
       var source, _yield$ordering$busin, result;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
@@ -114,11 +114,8 @@ var AddressDetails = function AddressDetails(props) {
             return _context.stop();
         }
       }, _callee, null, [[0, 11]]);
-    }));
-    return function getBusiness() {
-      return _ref.apply(this, arguments);
-    };
-  }();
+    }))).apply(this, arguments);
+  };
   (0, _react.useEffect)(function () {
     if (isMultiCheckout) return;
     if (props.location && props.businessLogo && !props.uuid) {
@@ -136,7 +133,7 @@ var AddressDetails = function AddressDetails(props) {
   (0, _react.useEffect)(function () {
     if (!logo || !location) return;
     setFormatUrl(formatUrlMethod(location));
-  }, [logo, location]);
+  }, [logo, JSON.stringify(location), JSON.stringify(orderState === null || orderState === void 0 || (_orderState$options2 = orderState.options) === null || _orderState$options2 === void 0 || (_orderState$options2 = _orderState$options2.address) === null || _orderState$options2 === void 0 ? void 0 : _orderState$options2.address)]);
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, UIComponent && /*#__PURE__*/_react.default.createElement(UIComponent, _extends({}, props, {
     googleMapsUrl: isMultiCheckout ? formatUrlMethod() : formatUrl
   })));

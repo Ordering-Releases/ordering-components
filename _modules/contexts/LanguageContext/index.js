@@ -36,7 +36,7 @@ var LanguageContext = /*#__PURE__*/(0, _react.createContext)();
  */
 exports.LanguageContext = LanguageContext;
 var LanguageProvider = function LanguageProvider(_ref) {
-  var _state$language4;
+  var _ref2, _ref3, _ref4, _ref5, _state$language4;
   var settings = _ref.settings,
     children = _ref.children,
     strategy = _ref.strategy;
@@ -51,8 +51,8 @@ var LanguageProvider = function LanguageProvider(_ref) {
   /**
    * Load language from localstorage and set state or load default language
    */
-  var setLanguageFromLocalStorage = /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+  var setLanguageFromLocalStorage = function setLanguageFromLocalStorage() {
+    return (_ref2 = _ref2 || _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
       var language;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
@@ -74,17 +74,14 @@ var LanguageProvider = function LanguageProvider(_ref) {
             return _context.stop();
         }
       }, _callee);
-    }));
-    return function setLanguageFromLocalStorage() {
-      return _ref2.apply(this, arguments);
-    };
-  }();
+    }))).apply(this, arguments);
+  };
   var _useApi = (0, _ApiContext.useApi)(),
     _useApi2 = _slicedToArray(_useApi, 2),
     ordering = _useApi2[0],
     apiHelper = _useApi2[1];
-  var refreshTranslations = /*#__PURE__*/function () {
-    var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+  var refreshTranslations = function refreshTranslations() {
+    return (_ref3 = _ref3 || _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
       var _yield$ordering$trans, _yield$ordering$trans2, error, result;
       return _regeneratorRuntime().wrap(function _callee2$(_context2) {
         while (1) switch (_context2.prev = _context2.next) {
@@ -117,30 +114,31 @@ var LanguageProvider = function LanguageProvider(_ref) {
             return _context2.stop();
         }
       }, _callee2, null, [[0, 11]]);
-    }));
-    return function refreshTranslations() {
-      return _ref3.apply(this, arguments);
-    };
-  }();
-  var loadDefaultLanguage = /*#__PURE__*/function () {
-    var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-      var _yield$ordering$langu, _yield$ordering$langu2, error, result, language;
+    }))).apply(this, arguments);
+  };
+  var loadDefaultLanguage = function loadDefaultLanguage() {
+    return (_ref4 = _ref4 || _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      var _language, _yield$ordering$langu, _yield$ordering$langu2, error, result, language;
       return _regeneratorRuntime().wrap(function _callee3$(_context3) {
         while (1) switch (_context3.prev = _context3.next) {
           case 0:
-            _context3.prev = 0;
-            _context3.next = 3;
+            _context3.next = 2;
+            return strategy.getItem('language', true);
+          case 2:
+            _language = _context3.sent;
+            _context3.prev = 3;
+            _context3.next = 6;
             return ordering.languages().where([{
-              attribute: 'default',
+              attribute: _language ? _language === null || _language === void 0 ? void 0 : _language.code : 'default',
               value: true
             }]).get();
-          case 3:
+          case 6:
             _yield$ordering$langu = _context3.sent;
             _yield$ordering$langu2 = _yield$ordering$langu.content;
             error = _yield$ordering$langu2.error;
             result = _yield$ordering$langu2.result;
             if (!error) {
-              _context3.next = 10;
+              _context3.next = 13;
               break;
             }
             setState(_objectSpread(_objectSpread({}, state), {}, {
@@ -148,39 +146,33 @@ var LanguageProvider = function LanguageProvider(_ref) {
               error: typeof result === 'string' ? result : result === null || result === void 0 ? void 0 : result[0]
             }));
             return _context3.abrupt("return");
-          case 10:
+          case 13:
             language = {
               id: result[0].id,
               code: result[0].code,
               rtl: result[0].rtl
             };
-            _context3.next = 13;
-            return strategy.setItem('language', language, true);
-          case 13:
             apiHelper.setLanguage(result[0].code);
             setState(_objectSpread(_objectSpread({}, state), {}, {
               language: language
             }));
-            _context3.next = 20;
+            _context3.next = 21;
             break;
-          case 17:
-            _context3.prev = 17;
-            _context3.t0 = _context3["catch"](0);
+          case 18:
+            _context3.prev = 18;
+            _context3.t0 = _context3["catch"](3);
             setState(_objectSpread(_objectSpread({}, state), {}, {
               loading: false
             }));
-          case 20:
+          case 21:
           case "end":
             return _context3.stop();
         }
-      }, _callee3, null, [[0, 17]]);
-    }));
-    return function loadDefaultLanguage() {
-      return _ref4.apply(this, arguments);
-    };
-  }();
-  var setLanguage = /*#__PURE__*/function () {
-    var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(language) {
+      }, _callee3, null, [[3, 18]]);
+    }))).apply(this, arguments);
+  };
+  var setLanguage = function setLanguage(_x) {
+    return (_ref5 = _ref5 || _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(language) {
       var _state$language;
       var _language;
       return _regeneratorRuntime().wrap(function _callee4$(_context4) {
@@ -210,11 +202,8 @@ var LanguageProvider = function LanguageProvider(_ref) {
             return _context4.stop();
         }
       }, _callee4);
-    }));
-    return function setLanguage(_x) {
-      return _ref5.apply(this, arguments);
-    };
-  }();
+    }))).apply(this, arguments);
+  };
 
   /**
    * Refresh translation when change language from ordering

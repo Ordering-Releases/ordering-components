@@ -31,13 +31,15 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 var AddressForm = function AddressForm(props) {
+  var _ref, _ref2, _ref3;
   var UIComponent = props.UIComponent,
     addressId = props.addressId,
     address = props.address,
     useValidationFileds = props.useValidationFileds,
     onSaveAddress = props.onSaveAddress,
     isSelectedAfterAdd = props.isSelectedAfterAdd,
-    onSaveCustomAddress = props.onSaveCustomAddress;
+    onSaveCustomAddress = props.onSaveCustomAddress,
+    franchiseId = props.franchiseId;
   var _useApi = (0, _ApiContext.useApi)(),
     _useApi2 = _slicedToArray(_useApi, 1),
     ordering = _useApi2[0];
@@ -95,8 +97,8 @@ var AddressForm = function AddressForm(props) {
    * @param {number} userId User id for address user
    * @param {number} addressId Address id for address
    */
-  var loadAddress = /*#__PURE__*/function () {
-    var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(userId, addressId) {
+  var loadAddress = function loadAddress(_x, _x2) {
+    return (_ref = _ref || _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(userId, addressId) {
       var source, _yield$ordering$users, content;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
@@ -137,11 +139,8 @@ var AddressForm = function AddressForm(props) {
             return _context.stop();
         }
       }, _callee, null, [[0, 11]]);
-    }));
-    return function loadAddress(_x, _x2) {
-      return _ref.apply(this, arguments);
-    };
-  }();
+    }))).apply(this, arguments);
+  };
 
   /**
    * Update address data
@@ -183,8 +182,8 @@ var AddressForm = function AddressForm(props) {
    * Function to save current changes
    * Update if address id exist or create if not
    */
-  var saveAddress = /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(values, userCustomerSetup) {
+  var saveAddress = function saveAddress(_x3, _x4) {
+    return (_ref2 = _ref2 || _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(values, userCustomerSetup) {
       var _values$country_code, _formState$changes, _addressState$address, _yield$ordering$users2, content, _content$result;
       return _regeneratorRuntime().wrap(function _callee2$(_context2) {
         while (1) switch (_context2.prev = _context2.next) {
@@ -254,18 +253,21 @@ var AddressForm = function AddressForm(props) {
             return _context2.stop();
         }
       }, _callee2, null, [[9, 19]]);
-    }));
-    return function saveAddress(_x3, _x4) {
-      return _ref2.apply(this, arguments);
-    };
-  }();
-  var getBusinessDeliveryZones = /*#__PURE__*/function () {
-    var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(location) {
+    }))).apply(this, arguments);
+  };
+  var getBusinessDeliveryZones = function getBusinessDeliveryZones(_x5) {
+    return (_ref3 = _ref3 || _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3(location) {
       var where, conditions, parameters, source, fetchEndpoint, _yield$fetchEndpoint$, _yield$fetchEndpoint$2, error, result;
       return _regeneratorRuntime().wrap(function _callee3$(_context3) {
         while (1) switch (_context3.prev = _context3.next) {
           case 0:
-            _context3.prev = 0;
+            if (location) {
+              _context3.next = 2;
+              break;
+            }
+            return _context3.abrupt("return");
+          case 2:
+            _context3.prev = 2;
             setBusinessesList(_objectSpread(_objectSpread({}, businessesList), {}, {
               loading: true,
               businesses: []
@@ -273,16 +275,15 @@ var AddressForm = function AddressForm(props) {
             where = null;
             conditions = [];
             parameters = {
-              location: location,
+              location: "".concat(location === null || location === void 0 ? void 0 : location.lat, ",").concat(location === null || location === void 0 ? void 0 : location.lng),
               type: options === null || options === void 0 ? void 0 : options.type
             };
-            conditions.push({
-              attribute: 'types',
-              conditions: [{
-                attribute: 'id',
-                value: options === null || options === void 0 ? void 0 : options.type
-              }]
-            });
+            if (franchiseId) {
+              conditions.push({
+                attribute: 'franchise_id',
+                value: franchiseId
+              });
+            }
             where = {
               conditions: conditions,
               conector: 'AND'
@@ -290,11 +291,11 @@ var AddressForm = function AddressForm(props) {
             source = {};
             requestsState.businesses = source;
             fetchEndpoint = ordering.businesses().select(['delivery_zone', 'name', 'id', 'location', 'logo', 'slug', 'zones']).parameters(parameters).where(where);
-            _context3.next = 12;
+            _context3.next = 14;
             return fetchEndpoint.get({
               cancelToken: source
             });
-          case 12:
+          case 14:
             _yield$fetchEndpoint$ = _context3.sent;
             _yield$fetchEndpoint$2 = _yield$fetchEndpoint$.content;
             error = _yield$fetchEndpoint$2.error;
@@ -312,11 +313,11 @@ var AddressForm = function AddressForm(props) {
               result: result,
               fetched: true
             }));
-            _context3.next = 22;
+            _context3.next = 24;
             break;
-          case 19:
-            _context3.prev = 19;
-            _context3.t0 = _context3["catch"](0);
+          case 21:
+            _context3.prev = 21;
+            _context3.t0 = _context3["catch"](2);
             if (_context3.t0.constructor.name !== 'Cancel') {
               setBusinessesList(_objectSpread(_objectSpread({}, businessesList), {}, {
                 loading: false,
@@ -325,16 +326,13 @@ var AddressForm = function AddressForm(props) {
                 result: [_context3.t0.message]
               }));
             }
-          case 22:
+          case 24:
           case "end":
             return _context3.stop();
         }
-      }, _callee3, null, [[0, 19]]);
-    }));
-    return function getBusinessDeliveryZones(_x5) {
-      return _ref3.apply(this, arguments);
-    };
-  }();
+      }, _callee3, null, [[2, 21]]);
+    }))).apply(this, arguments);
+  };
   (0, _react.useEffect)(function () {
     setAddressState(_objectSpread(_objectSpread({}, addressState), {}, {
       address: address || {}
