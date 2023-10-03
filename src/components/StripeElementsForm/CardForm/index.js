@@ -27,7 +27,7 @@ export const CardForm = (props) => {
     businessIds
   } = props
 
-  const [{ user }] = useSession()
+  const [{ user, token }] = useSession()
   const [ordering] = useApi()
   const [validationFields] = useValidationFields()
   const socket = useWebsocket()
@@ -54,7 +54,7 @@ export const CardForm = (props) => {
     const result = await fetch(`${ordering.root}/payments/stripe/cards`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${user?.session?.access_token}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
         'X-App-X': ordering.appId,
         'X-Socket-Id-X': socket?.getId()
