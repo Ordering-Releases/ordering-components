@@ -37,9 +37,9 @@ export const OrderListGroups = (props) => {
   const ordersStatusArray = combineTabs ? ['active', 'completed', 'cancelled'] : ['pending', 'inProgress', 'completed', 'cancelled']
 
   const ordersGroupStatus = {
-    active: orderGroupStatusCustom?.active ?? [0, 3, 4, 7, 8, 9, 13, 14, 18, 19, 20, 21, 22, 23],
+    active: orderGroupStatusCustom?.active ?? [0, 3, 4, 7, 8, 9, 13, 14, 18, 19, 20, 21, 22, 23, 24, 25],
     pending: orderGroupStatusCustom?.pending ?? [0, 13],
-    inProgress: orderGroupStatusCustom?.inProgress ?? [3, 4, 7, 8, 9, 14, 18, 19, 20, 21, 22, 23],
+    inProgress: orderGroupStatusCustom?.inProgress ?? [3, 4, 7, 8, 9, 14, 18, 19, 20, 21, 22, 23, 24, 25],
     completed: orderGroupStatusCustom?.completed ?? [1, 11, 15],
     cancelled: orderGroupStatusCustom?.cancelled ?? [2, 5, 6, 10, 12, 16, 17]
   }
@@ -61,27 +61,32 @@ export const OrderListGroups = (props) => {
     active: {
       ...orderStructure,
       defaultFilter: ordersGroupStatus.active,
-      currentFilter: ordersGroupStatus.active
+      currentFilter: ordersGroupStatus.active,
+      fetched: false
     },
     pending: {
       ...orderStructure,
       defaultFilter: ordersGroupStatus.pending,
-      currentFilter: ordersGroupStatus.pending
+      currentFilter: ordersGroupStatus.pending,
+      fetched: false
     },
     inProgress: {
       ...orderStructure,
       defaultFilter: ordersGroupStatus.inProgress,
-      currentFilter: ordersGroupStatus.inProgress
+      currentFilter: ordersGroupStatus.inProgress,
+      fetched: false
     },
     completed: {
       ...orderStructure,
       defaultFilter: ordersGroupStatus.completed,
-      currentFilter: ordersGroupStatus.completed
+      currentFilter: ordersGroupStatus.completed,
+      fetched: false
     },
     cancelled: {
       ...orderStructure,
       defaultFilter: ordersGroupStatus.cancelled,
-      currentFilter: ordersGroupStatus.cancelled
+      currentFilter: ordersGroupStatus.cancelled,
+      fetched: false
     }
   })
   const [currentTabSelected, setCurrentTabSelected] = useState(combineTabs ? 'active' : 'pending')
@@ -348,6 +353,7 @@ export const OrderListGroups = (props) => {
           loading: false,
           orders: _ordersCleaned,
           error: error ? result : null,
+          fetched: true,
           pagination: {
             ...ordersGroup[currentTabSelected].pagination,
             currentPage: pagination.current_page,
@@ -622,23 +628,23 @@ export const OrderListGroups = (props) => {
         ? [{ ...order, action: type + order?.status }, ...orderList]
         : orderList.filter((_order) => _order.id !== order.id)
     }
-
-    ordersGroup[status].orders = sortOrders(orders)
     let _pagination = ordersGroup[status].pagination
-
     if (type !== 'update') {
       _pagination = {
         ...ordersGroup[status].pagination,
         total: ordersGroup[status].pagination.total + (type === 'add' ? 1 : -1)
       }
-      ordersGroup[status].pagination = _pagination
     }
-
-    setOrdersGroup({
-      ...ordersGroup,
+    setOrdersGroup((prevState) => ({
+      ...prevState,
       orders: filterByIdUnique(sortOrders(orders)),
+      [status]: {
+        ...prevState[status],
+        orders: sortOrders(orders),
+        pagination: _pagination
+      },
       pagination: _pagination
-    })
+    }))
   }
 
   const handleClickOrder = (orderAux) => {
@@ -810,7 +816,7 @@ export const OrderListGroups = (props) => {
     setCurrentFilters(ordersGroup[currentTabSelected]?.currentFilter)
     if (currentTabSelected === 'logisticOrders') {
       loadLogisticOrders(!!logisticOrders?.orders)
-    } else if (ordersGroup[currentTabSelected]?.pagination?.total === null && props.isNetConnected) {
+    } else if (!ordersGroup[currentTabSelected]?.fetched && props.isNetConnected) {
       loadOrders({ newFetchCurrent: true })
     }
   }, [currentTabSelected, props.isNetConnected])
@@ -838,7 +844,7 @@ export const OrderListGroups = (props) => {
   }
 
   useEffect(() => {
-    if (ordersGroup[currentTabSelected]?.loading || !socket?.socket || !socket?.socket?.connected) return
+    if (!socket?.socket || !socket?.socket?.connected) return
     const handleUpdateOrder = (order) => {
       if (session?.user?.level === 2 && businessIDs.length > 0 && !businessIDs.includes(order.business_id)) return
       handleActionEvent('update_order', order)
@@ -865,7 +871,7 @@ export const OrderListGroups = (props) => {
           typeof order?.status !== 'number' ||
           !order?.customer ||
           !order?.business ||
-          !order?.paymethod
+          (!order?.paymethod && !order?.payment_events?.some(e => e.event === 'payment'))
         ) {
           return
         }
@@ -953,12 +959,13 @@ export const OrderListGroups = (props) => {
     if (socket?.socket?._callbacks?.$message?.length < 2) {
       socket.on('message', handleReceiveMessage)
     }
+
     return () => {
       socket.off('orders_register', handleAddNewOrder)
       socket.off('update_order', handleUpdateOrder)
       socket.off('message', handleReceiveMessage)
     }
-  }, [ordersGroup, socket?.socket, session, events])
+  }, [JSON.stringify(ordersGroup), socket?.socket, session])
 
   const handleAddAssignRequest = useCallback(
     (order) => {
