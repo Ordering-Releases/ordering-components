@@ -573,9 +573,6 @@ var ProductForm = exports.ProductForm = function ProductForm(props) {
                       } else {
                         _selectedSuboptions["suboption:".concat(_suboption.id)] = false;
                       }
-                    } else {
-                      var _option2$suboptions;
-                      _selectedSuboptions["suboption:".concat(_suboption.id)] = (_suboption === null || _suboption === void 0 ? void 0 : _suboption.preselected) || (_option2 === null || _option2 === void 0 ? void 0 : _option2.max) === 1 && (_option2 === null || _option2 === void 0 ? void 0 : _option2.min) === 1 && (_option2 === null || _option2 === void 0 || (_option2$suboptions = _option2.suboptions) === null || _option2$suboptions === void 0 ? void 0 : _option2$suboptions.length) === 1;
                     }
                   }
                 } catch (err) {
@@ -664,12 +661,15 @@ var ProductForm = exports.ProductForm = function ProductForm(props) {
         return count + suboption.quantity;
       }, 0);
     }
+    var hasPreselectedFlow = suboptionsArray.filter(function (state) {
+      var _state$suboption;
+      return state === null || state === void 0 || (_state$suboption = state.suboption) === null || _state$suboption === void 0 ? void 0 : _state$suboption.preselected;
+    });
     if (newBalance <= option.max) {
-      var _suboptionsArray;
       newProductCart.options["id:".concat(option.id)].balance = newBalance;
       newProductCart.unitTotal = getUnitTotal(newProductCart);
       newProductCart.total = newProductCart.unitTotal * newProductCart.quantity;
-      if (state.selected && ((_suboptionsArray = suboptionsArray) === null || _suboptionsArray === void 0 ? void 0 : _suboptionsArray.length) > 0) {
+      if (state.selected && (hasPreselectedFlow === null || hasPreselectedFlow === void 0 ? void 0 : hasPreselectedFlow.length) > 0) {
         handleChangeSuboptionDefault(suboptionsArray);
         setSelectedSuboptions(_selectedSuboptions);
       } else {

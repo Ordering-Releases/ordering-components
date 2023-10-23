@@ -52,7 +52,7 @@ export const StoreProductList = (props) => {
         page: newFetch ? 1 : productsList?.pagination?.currentPage + 1,
         page_size: productsList?.pagination?.pageSize
       }
-
+      
       let where = null
       const conditions = []
       if (productSearch) {
@@ -169,7 +169,7 @@ export const StoreProductList = (props) => {
             }
           }
           return product
-        })
+        }) 
         setProductsList({ ...productsList, products: updatedProducts })
         showToast(ToastType.Success, result?.enabled
           ? t('ENABLED_PRODUCT', 'Enabled product')
@@ -181,7 +181,7 @@ export const StoreProductList = (props) => {
       showToast(ToastType.Error, err.message)
     }
   }
-
+  
 
   const updateStoreCategory = async (categoryId, updateParams = {}) => {
     try {

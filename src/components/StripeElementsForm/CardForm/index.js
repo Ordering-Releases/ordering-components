@@ -61,7 +61,7 @@ export const CardForm = (props) => {
       },
       body: JSON.stringify({
         business_id: businessId,
-        gateway: 'stripe',
+        gateway: 'stripe', 
         token_id: tokenId,
         user_id: user?.id
       })
