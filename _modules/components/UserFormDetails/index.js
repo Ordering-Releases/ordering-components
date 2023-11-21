@@ -11,6 +11,7 @@ var _ApiContext = require("../../contexts/ApiContext");
 var _CustomerContext = require("../../contexts/CustomerContext");
 var _ValidationsFieldsContext = require("../../contexts/ValidationsFieldsContext");
 var _WebsocketContext = require("../../contexts/WebsocketContext");
+var _libphonenumberJs = _interopRequireDefault(require("libphonenumber-js"));
 var _excluded = ["photo"];
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
@@ -33,6 +34,8 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t.return && (u = t.return(), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+var CONDITIONAL_CODES = ['1787'];
+
 /**
  * Component to manage user form details behavior without UI component
  */
@@ -49,7 +52,9 @@ var UserFormDetails = exports.UserFormDetails = function UserFormDetails(props) 
     isCustomerMode = props.isCustomerMode,
     isSuccess = props.isSuccess,
     onClose = props.onClose,
-    dontToggleEditMode = props.dontToggleEditMode;
+    dontToggleEditMode = props.dontToggleEditMode,
+    isOrderTypeValidationField = props.isOrderTypeValidationField,
+    checkoutFields = props.checkoutFields;
   var _useApi = (0, _ApiContext.useApi)(),
     _useApi2 = _slicedToArray(_useApi, 1),
     ordering = _useApi2[0];
@@ -191,7 +196,7 @@ var UserFormDetails = exports.UserFormDetails = function UserFormDetails(props) 
    */
   var handleUpdateClick = /*#__PURE__*/function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(changes, isImage, image) {
-      var response, _props$userData, _formState$changes, photo, _changes2, _props$userData2, _changes$setCustomerI;
+      var response, _changes, parsedNumber, _props$userData, _formState$changes, photo, _changes2, _props$userData2, _changes$setCustomerI;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
@@ -205,20 +210,29 @@ var UserFormDetails = exports.UserFormDetails = function UserFormDetails(props) 
             setFormState(_objectSpread(_objectSpread({}, formState), {}, {
               loading: true
             }));
-            if (changes) {
-              formState.changes = _objectSpread(_objectSpread({}, formState.changes), changes);
+            _changes = _objectSpread(_objectSpread({}, formState.changes), changes !== null && changes !== void 0 ? changes : {});
+            if (!(_changes !== null && _changes !== void 0 && _changes.country_code) && _changes !== null && _changes !== void 0 && _changes.country_phone_code && _changes !== null && _changes !== void 0 && _changes.cellphone) {
+              parsedNumber = (0, _libphonenumberJs.default)("+".concat(_changes === null || _changes === void 0 ? void 0 : _changes.country_phone_code).concat(_changes === null || _changes === void 0 ? void 0 : _changes.cellphone));
+              _changes.country_code = parsedNumber.country;
             }
+            if (CONDITIONAL_CODES.includes(_changes === null || _changes === void 0 ? void 0 : _changes.country_phone_code)) {
+              if ((_changes === null || _changes === void 0 ? void 0 : _changes.country_code) === 'PR') {
+                _changes.cellphone = "787".concat(_changes.cellphone);
+                _changes.country_phone_code = '1';
+              }
+            }
+            formState.changes = _changes;
             if (!isImage) {
-              _context.next = 13;
+              _context.next = 16;
               break;
             }
-            _context.next = 8;
+            _context.next = 11;
             return ordering.users((props === null || props === void 0 || (_props$userData = props.userData) === null || _props$userData === void 0 ? void 0 : _props$userData.id) || userState.result.result.id).save({
               photo: image || formState.changes.photo
             }, {
               accessToken: accessToken
             });
-          case 8:
+          case 11:
             response = _context.sent;
             _formState$changes = formState.changes, photo = _formState$changes.photo, _changes2 = _objectWithoutProperties(_formState$changes, _excluded);
             setFormState(_objectSpread(_objectSpread({}, formState), {}, {
@@ -226,21 +240,21 @@ var UserFormDetails = exports.UserFormDetails = function UserFormDetails(props) 
               result: response.content,
               loading: false
             }));
-            _context.next = 17;
+            _context.next = 20;
             break;
-          case 13:
-            _context.next = 15;
+          case 16:
+            _context.next = 18;
             return ordering.users((props === null || props === void 0 || (_props$userData2 = props.userData) === null || _props$userData2 === void 0 ? void 0 : _props$userData2.id) || userState.result.result.id).save(formState.changes, {
               accessToken: accessToken
             });
-          case 15:
+          case 18:
             response = _context.sent;
             setFormState(_objectSpread(_objectSpread({}, formState), {}, {
               changes: response.content.error ? formState.changes : {},
               result: response.content,
               loading: false
             }));
-          case 17:
+          case 20:
             if (!response.content.error) {
               setUserState(_objectSpread(_objectSpread({}, userState), {}, {
                 loadingDriver: false,
@@ -259,10 +273,10 @@ var UserFormDetails = exports.UserFormDetails = function UserFormDetails(props) 
                 setIsEdit(!isEdit);
               }
             }
-            _context.next = 23;
+            _context.next = 26;
             break;
-          case 20:
-            _context.prev = 20;
+          case 23:
+            _context.prev = 23;
             _context.t0 = _context["catch"](2);
             setFormState(_objectSpread(_objectSpread({}, formState), {}, {
               result: {
@@ -271,11 +285,11 @@ var UserFormDetails = exports.UserFormDetails = function UserFormDetails(props) 
               },
               loading: false
             }));
-          case 23:
+          case 26:
           case "end":
             return _context.stop();
         }
-      }, _callee, null, [[2, 20]]);
+      }, _callee, null, [[2, 23]]);
     }));
     return function handleUpdateClick(_x, _x2, _x3) {
       return _ref.apply(this, arguments);
@@ -333,12 +347,27 @@ var UserFormDetails = exports.UserFormDetails = function UserFormDetails(props) 
    * @param {string} fieldName Field name
    */
   var isRequiredField = function isRequiredField(fieldName) {
-    var _validationFields$fie4, _validationFields$fie5, _validationFields$fie6;
-    return useValidationFields && !validationFields.loading && ((_validationFields$fie4 = validationFields.fields) === null || _validationFields$fie4 === void 0 || (_validationFields$fie4 = _validationFields$fie4.checkout) === null || _validationFields$fie4 === void 0 ? void 0 : _validationFields$fie4[fieldName]) && ((_validationFields$fie5 = validationFields.fields) === null || _validationFields$fie5 === void 0 || (_validationFields$fie5 = _validationFields$fie5.checkout) === null || _validationFields$fie5 === void 0 || (_validationFields$fie5 = _validationFields$fie5[fieldName]) === null || _validationFields$fie5 === void 0 ? void 0 : _validationFields$fie5.enabled) && ((_validationFields$fie6 = validationFields.fields) === null || _validationFields$fie6 === void 0 || (_validationFields$fie6 = _validationFields$fie6.checkout) === null || _validationFields$fie6 === void 0 || (_validationFields$fie6 = _validationFields$fie6[fieldName]) === null || _validationFields$fie6 === void 0 ? void 0 : _validationFields$fie6.required);
+    var _checkoutRequiredFiel, _validationFields$fie4, _validationFields$fie5, _validationFields$fie6;
+    var checkoutRequiredFields = null;
+    if (isOrderTypeValidationField) {
+      var _session$user, _checkoutFields$filte, _checkoutFields$filte2;
+      checkoutRequiredFields = session !== null && session !== void 0 && (_session$user = session.user) !== null && _session$user !== void 0 && _session$user.guest_id ? checkoutFields === null || checkoutFields === void 0 || (_checkoutFields$filte = checkoutFields.filter(function (field) {
+        return (field === null || field === void 0 ? void 0 : field.enabled) && (field === null || field === void 0 ? void 0 : field.required_with_guest);
+      })) === null || _checkoutFields$filte === void 0 ? void 0 : _checkoutFields$filte.map(function (field) {
+        var _field$validation_fie;
+        return field === null || field === void 0 || (_field$validation_fie = field.validation_field) === null || _field$validation_fie === void 0 ? void 0 : _field$validation_fie.code;
+      }) : checkoutFields === null || checkoutFields === void 0 || (_checkoutFields$filte2 = checkoutFields.filter(function (field) {
+        return (field === null || field === void 0 ? void 0 : field.enabled) && (field === null || field === void 0 ? void 0 : field.required);
+      })) === null || _checkoutFields$filte2 === void 0 ? void 0 : _checkoutFields$filte2.map(function (field) {
+        var _field$validation_fie2;
+        return field === null || field === void 0 || (_field$validation_fie2 = field.validation_field) === null || _field$validation_fie2 === void 0 ? void 0 : _field$validation_fie2.code;
+      });
+    }
+    return isOrderTypeValidationField ? (_checkoutRequiredFiel = checkoutRequiredFields) === null || _checkoutRequiredFiel === void 0 ? void 0 : _checkoutRequiredFiel.includes(fieldName) : useValidationFields && !validationFields.loading && ((_validationFields$fie4 = validationFields.fields) === null || _validationFields$fie4 === void 0 || (_validationFields$fie4 = _validationFields$fie4.checkout) === null || _validationFields$fie4 === void 0 ? void 0 : _validationFields$fie4[fieldName]) && ((_validationFields$fie5 = validationFields.fields) === null || _validationFields$fie5 === void 0 || (_validationFields$fie5 = _validationFields$fie5.checkout) === null || _validationFields$fie5 === void 0 || (_validationFields$fie5 = _validationFields$fie5[fieldName]) === null || _validationFields$fie5 === void 0 ? void 0 : _validationFields$fie5.enabled) && ((_validationFields$fie6 = validationFields.fields) === null || _validationFields$fie6 === void 0 || (_validationFields$fie6 = _validationFields$fie6.checkout) === null || _validationFields$fie6 === void 0 || (_validationFields$fie6 = _validationFields$fie6[fieldName]) === null || _validationFields$fie6 === void 0 ? void 0 : _validationFields$fie6.required);
   };
   var handleToggleAvalaibleStatusDriver = /*#__PURE__*/function () {
     var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(newValue) {
-      var _session$user, response;
+      var _session$user2, response;
       return _regeneratorRuntime().wrap(function _callee2$(_context2) {
         while (1) switch (_context2.prev = _context2.next) {
           case 0:
@@ -347,7 +376,7 @@ var UserFormDetails = exports.UserFormDetails = function UserFormDetails(props) 
               loadingDriver: true
             }));
             _context2.next = 4;
-            return ordering.users(session === null || session === void 0 || (_session$user = session.user) === null || _session$user === void 0 ? void 0 : _session$user.id).save({
+            return ordering.users(session === null || session === void 0 || (_session$user2 = session.user) === null || _session$user2 === void 0 ? void 0 : _session$user2.id).save({
               available: newValue
             }, {
               accessToken: accessToken
