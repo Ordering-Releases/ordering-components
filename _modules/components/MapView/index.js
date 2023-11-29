@@ -73,7 +73,7 @@ var MapView = exports.MapView = function MapView(props) {
               query: {
                 where: [{
                   attribute: 'status',
-                  value: [0, 13, 7, 4, 3, 8, 9, 14, 18, 19, 20, 21]
+                  value: [0, 13, 7, 4, 3, 8, 9, 14, 18, 19, 20, 21, 23, 26]
                 }]
               }
             };
@@ -153,7 +153,6 @@ var MapView = exports.MapView = function MapView(props) {
       // customerMarkerGroups[order?.customer_id] = order?.driver_id !== session?.user?.id ? customerMakers.filter(_order => order?.id === _order?.id) : [...customerMakers, order]
       // setIsLoadingBusinessMakers(false)
     };
-
     events.on('order_updated', handleUpdateOrder);
     events.on('order_added', handleUpdateOrder);
     return function () {
