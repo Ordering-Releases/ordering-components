@@ -20,8 +20,7 @@ export const Checkout = (props) => {
     onPlaceOrderClick,
     UIComponent,
     isApp,
-    isKiosk,
-    isCustomerMode
+    isKiosk
   } = props
 
   const [ordering] = useApi()
@@ -31,7 +30,7 @@ export const Checkout = (props) => {
 
   const [placing, setPlacing] = useState(false)
   const [errors, setErrors] = useState(null)
-  const [alseaCheckPriceError, setAlseaCheckpriceError] = useState(null)
+
   /**
    * Language context
    */
@@ -43,7 +42,7 @@ export const Checkout = (props) => {
   /**
    * Session content
    */
-  const [{ token, user }] = useSession()
+  const [{ token }] = useSession()
   /**
    * Toast state
    */
@@ -497,39 +496,6 @@ export const Checkout = (props) => {
     getValidationFieldOrderTypes()
   }, [])
 
-  useEffect(() => {
-    const alseaProjects = ['alsea', 'alsea-staging']
-    const amount = cart?.balance ?? cart?.total
-    if (!(alseaProjects.includes(ordering.project) && amount && isCustomerMode)) return
-    const handleAlseaCheckPrice = async () => {
-      try {
-        const customerFromLocalStorage = await window.localStorage.getItem('user-customer', true)
-        const response = await fetch('https://alsea-plugins-staging.ordering.co/alseaplatform/api_checkprice.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-App-X': ordering.appId,
-            Authorization: `bearer ${token}`
-          },
-          body: JSON.stringify({
-            amount: amount,
-            user_id: customerFromLocalStorage?.id || user.id,
-            uuid: cart.uuid
-          })
-        })
-        const result = await response.json()
-        if (result.error) {
-          setAlseaCheckpriceError(t(result?.result))
-        } else {
-          setAlseaCheckpriceError(null)
-        }
-      } catch (err) {
-        setAlseaCheckpriceError(err?.message)
-      }
-    }
-    handleAlseaCheckPrice()
-  }, [isCustomerMode, cart?.balance, cart?.total])
-
   return (
     <>
       {UIComponent && (
@@ -555,7 +521,6 @@ export const Checkout = (props) => {
           handleChangeDeliveryOption={handleChangeDeliveryOption}
           handleConfirmCredomaticPage={handleConfirmCredomaticPage}
           checkoutFieldsState={checkoutFieldsState}
-          alseaCheckPriceError={alseaCheckPriceError}
         />
       )}
     </>
