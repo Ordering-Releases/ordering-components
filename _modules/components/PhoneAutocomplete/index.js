@@ -118,7 +118,7 @@ var PhoneAutocomplete = exports.PhoneAutocomplete = function PhoneAutocomplete(p
         while (1) switch (_context.prev = _context.next) {
           case 0:
             maxRetries = 3;
-            waitTime = 5000;
+            waitTime = 500000;
             retryAttempt = 1;
           case 3:
             if (!(retryAttempt <= maxRetries)) {
