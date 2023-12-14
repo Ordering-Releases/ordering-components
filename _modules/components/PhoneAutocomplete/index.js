@@ -113,19 +113,10 @@ var PhoneAutocomplete = exports.PhoneAutocomplete = function PhoneAutocomplete(p
    */
   var getUsers = /*#__PURE__*/function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-      var maxRetries, waitTime, retryAttempt, conditions, source, request, timer, response, result, _reqState$users;
+      var conditions, _yield$ordering$setAc, result;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
-            maxRetries = 3;
-            waitTime = 60000;
-            retryAttempt = 1;
-          case 3:
-            if (!(retryAttempt <= maxRetries)) {
-              _context.next = 33;
-              break;
-            }
-            _context.prev = 4;
             setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
               loading: true
             }));
@@ -151,63 +142,30 @@ var PhoneAutocomplete = exports.PhoneAutocomplete = function PhoneAutocomplete(p
                 }]
               }]
             };
-            source = {};
-            reqState.users = source;
-            request = ordering.setAccessToken(token).users().select(propsToFetch).where(conditions).get({
-              cancelToken: source
-            });
-            timer = new Promise(function (resolve, reject) {
-              setTimeout(function () {
-                return reject(new Error('Timeout exceeded'));
-              }, waitTime);
-            });
-            _context.next = 13;
-            return Promise.race([request, timer]);
-          case 13:
-            response = _context.sent;
-            if (!(response.content && response.content.result)) {
-              _context.next = 20;
-              break;
-            }
-            result = response.content.result;
+            _context.prev = 2;
+            _context.next = 5;
+            return ordering.setAccessToken(token).users().select(propsToFetch).where(conditions).get();
+          case 5:
+            _yield$ordering$setAc = _context.sent;
+            result = _yield$ordering$setAc.content.result;
             setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
               users: result,
               loading: false
             }));
-            return _context.abrupt("break", 33);
-          case 20:
-            throw new Error('Error');
-          case 21:
-            _context.next = 30;
+            _context.next = 13;
             break;
-          case 23:
-            _context.prev = 23;
-            _context.t0 = _context["catch"](4);
-            ((_reqState$users = reqState.users) === null || _reqState$users === void 0 ? void 0 : _reqState$users.cancel) && reqState.users.cancel();
-            if (!(retryAttempt < maxRetries)) {
-              _context.next = 29;
-              break;
-            }
-            _context.next = 29;
-            return new Promise(function (resolve) {
-              return setTimeout(resolve, waitTime);
-            });
-          case 29:
-            if (retryAttempt === maxRetries) {
-              setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
-                loading: false,
-                error: t('ERROR_MULTIPLE_FETCH', 'Exceeded the maximum number of retries. Reload the page.')
-              }));
-            }
-          case 30:
-            retryAttempt++;
-            _context.next = 3;
-            break;
-          case 33:
+          case 10:
+            _context.prev = 10;
+            _context.t0 = _context["catch"](2);
+            setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
+              loading: false,
+              error: _context.t0.message
+            }));
+          case 13:
           case "end":
             return _context.stop();
         }
-      }, _callee, null, [[4, 23]]);
+      }, _callee, null, [[2, 10]]);
     }));
     return function getUsers() {
       return _ref.apply(this, arguments);

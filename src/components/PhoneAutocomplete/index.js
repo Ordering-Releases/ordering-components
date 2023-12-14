@@ -32,71 +32,41 @@ export const PhoneAutocomplete = (props) => {
    * Get users from API
    */
   const getUsers = async () => {
-    const maxRetries = 3
-    const waitTime = 60000
-
-    for (let retryAttempt = 1; retryAttempt <= maxRetries; retryAttempt++) {
-      try {
-        setCustomersPhones({ ...customersPhones, loading: true })
-        const conditions = {
-          conector: 'AND',
-          conditions: [{
-            attribute: 'enabled',
-            value: isIos ? true : encodeURI(true)
-          },
-          {
-            conector: 'OR',
-            conditions: [{
-              attribute: 'cellphone',
-              value: {
-                condition: 'ilike',
-                value: isIos ? `%${phone}%` : encodeURI(`%${phone}%`)
-              }
-            },
-            {
-              attribute: 'phone',
-              value: {
-                condition: 'ilike',
-                value: isIos ? `%${phone}%` : encodeURI(`%${phone}%`)
-              }
-            }]
-          }]
-        }
-        const source = {}
-        reqState.users = source
-        const request = ordering
-          .setAccessToken(token)
-          .users()
-          .select(propsToFetch)
-          .where(conditions)
-          .get({ cancelToken: source })
-
-        const timer = new Promise((resolve, reject) => {
-          setTimeout(() => reject(new Error('Timeout exceeded')), waitTime)
-        })
-
-        const response = await Promise.race([request, timer])
-
-        if (response.content && response.content.result) {
-          const { result } = response.content
-          setCustomersPhones({ ...customersPhones, users: result, loading: false })
-          break
-        } else {
-          throw new Error('Error')
-        }
-      } catch {
-        reqState.users?.cancel && reqState.users.cancel()
-        if (retryAttempt < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, waitTime))
-        }
-        if (retryAttempt === maxRetries) {
-          setCustomersPhones({
-            ...customersPhones,
-            loading: false,
-            error: t('ERROR_MULTIPLE_FETCH', 'Exceeded the maximum number of retries. Reload the page.')
-          })
-        }
-      }
+    setCustomersPhones({ ...customersPhones, loading: true })
+    const conditions = {
+      conector: 'AND',
+      conditions: [{
+        attribute: 'enabled',
+        value: isIos ? true : encodeURI(true)
+      },
+      {
+        conector: 'OR',
+        conditions: [{
+          attribute: 'cellphone',
+          value: {
+            condition: 'ilike',
+            value: isIos ? `%${phone}%` : encodeURI(`%${phone}%`)
+          }
+        },
+        {
+          attribute: 'phone',
+          value: {
+            condition: 'ilike',
+            value: isIos ? `%${phone}%` : encodeURI(`%${phone}%`)
+          }
+        }]
+      }]
+    }
+    try {
+      const { content: { result } } = await ordering
+        .setAccessToken(token)
+        .users()
+        .select(propsToFetch)
+        .where(conditions)
+        .get()
+      setCustomersPhones({ ...customersPhones, users: result, loading: false })
+    } catch (e) {
+      setCustomersPhones({ ...customersPhones, loading: false, error: e.message })
     }
   }
   /**
