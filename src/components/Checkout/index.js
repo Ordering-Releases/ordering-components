@@ -75,6 +75,8 @@ export const Checkout = (props) => {
 
   const [checkoutFieldsState, setCheckoutFieldsState] = useState({ fields: [], loading: false, error: null })
 
+  const [isLoadingCheckprice, setIsLoadingCheckprice] = useState(false)
+
   const businessId = props.uuid
     ? Object.values(orderState.carts).find(_cart => _cart?.uuid === props.uuid)?.business_id ?? {}
     : props.businessId
@@ -522,7 +524,12 @@ export const Checkout = (props) => {
         if (result.error) {
           setAlseaCheckpriceError(t(result?.result))
         } else {
-          setAlseaCheckpriceError(null)
+          if (result?.result?.[0] !== 'ALSEA_CHECKPRICE_NOT_NECESSARY') {
+            setAlseaCheckpriceError(null)
+            setIsLoadingCheckprice(true)
+            await refreshOrderOptions()
+            setIsLoadingCheckprice(false)
+          }
         }
       } catch (err) {
         setAlseaCheckpriceError(err?.message)
@@ -557,6 +564,7 @@ export const Checkout = (props) => {
           handleConfirmCredomaticPage={handleConfirmCredomaticPage}
           checkoutFieldsState={checkoutFieldsState}
           alseaCheckPriceError={alseaCheckPriceError}
+          isLoadingCheckprice={isLoadingCheckprice}
         />
       )}
     </>
