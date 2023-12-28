@@ -113,13 +113,14 @@ var PhoneAutocomplete = exports.PhoneAutocomplete = function PhoneAutocomplete(p
    */
   var getUsers = /*#__PURE__*/function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-      var conditions, _yield$ordering$setAc, result;
+      var cellphone, conditions, _yield$ordering$setAc, result;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
             setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
               loading: true
             }));
+            cellphone = phone || urlPhone;
             conditions = {
               conector: 'AND',
               conditions: [{
@@ -131,41 +132,41 @@ var PhoneAutocomplete = exports.PhoneAutocomplete = function PhoneAutocomplete(p
                   attribute: 'cellphone',
                   value: {
                     condition: 'ilike',
-                    value: isIos ? "%".concat(phone, "%") : encodeURI("%".concat(phone, "%"))
+                    value: isIos ? "%".concat(cellphone, "%") : encodeURI("%".concat(cellphone, "%"))
                   }
                 }, {
                   attribute: 'phone',
                   value: {
                     condition: 'ilike',
-                    value: isIos ? "%".concat(phone, "%") : encodeURI("%".concat(phone, "%"))
+                    value: isIos ? "%".concat(cellphone, "%") : encodeURI("%".concat(cellphone, "%"))
                   }
                 }]
               }]
             };
-            _context.prev = 2;
-            _context.next = 5;
+            _context.prev = 3;
+            _context.next = 6;
             return ordering.setAccessToken(token).users().select(propsToFetch).where(conditions).get();
-          case 5:
+          case 6:
             _yield$ordering$setAc = _context.sent;
             result = _yield$ordering$setAc.content.result;
             setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
               users: result,
               loading: false
             }));
-            _context.next = 13;
+            _context.next = 14;
             break;
-          case 10:
-            _context.prev = 10;
-            _context.t0 = _context["catch"](2);
+          case 11:
+            _context.prev = 11;
+            _context.t0 = _context["catch"](3);
             setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
               loading: false,
               error: _context.t0.message
             }));
-          case 13:
+          case 14:
           case "end":
             return _context.stop();
         }
-      }, _callee, null, [[2, 10]]);
+      }, _callee, null, [[3, 11]]);
     }));
     return function getUsers() {
       return _ref.apply(this, arguments);

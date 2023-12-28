@@ -33,6 +33,7 @@ export const PhoneAutocomplete = (props) => {
    */
   const getUsers = async () => {
     setCustomersPhones({ ...customersPhones, loading: true })
+    const cellphone = phone || urlPhone
     const conditions = {
       conector: 'AND',
       conditions: [{
@@ -45,14 +46,14 @@ export const PhoneAutocomplete = (props) => {
           attribute: 'cellphone',
           value: {
             condition: 'ilike',
-            value: isIos ? `%${phone}%` : encodeURI(`%${phone}%`)
+            value: isIos ? `%${cellphone}%` : encodeURI(`%${cellphone}%`)
           }
         },
         {
           attribute: 'phone',
           value: {
             condition: 'ilike',
-            value: isIos ? `%${phone}%` : encodeURI(`%${phone}%`)
+            value: isIos ? `%${cellphone}%` : encodeURI(`%${cellphone}%`)
           }
         }]
       }]
