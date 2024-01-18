@@ -37,7 +37,7 @@ export const PaymentOptions = (props) => {
     const _paymethods = paymethods && paymethods
       .filter(credentials => isCustomerMode
         ? !paymethodsNotAllowed.includes(credentials?.paymethod?.gateway) &&
-        (isAlsea || paymethodsCallcenterMode.includes(credentials?.paymethod?.gateway))
+          (isAlsea || paymethodsCallcenterMode.includes(credentials?.paymethod?.gateway))
         : !paymethodsNotAllowed.includes(credentials?.paymethod?.gateway))
       .map(credentials => {
         return {

@@ -113,14 +113,29 @@ var PhoneAutocomplete = exports.PhoneAutocomplete = function PhoneAutocomplete(p
    */
   var getUsers = /*#__PURE__*/function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-      var cellphone, conditions, _yield$ordering$setAc, result;
+      var maxRetries, waitTime, cellphone, retryAttempt, conditions, source, request, timer, response, result, _reqState$users;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
+            if (!customersPhones.loading) {
+              _context.next = 2;
+              break;
+            }
+            return _context.abrupt("return");
+          case 2:
+            maxRetries = 3;
+            waitTime = 60000;
+            cellphone = phone || urlPhone;
+            retryAttempt = 1;
+          case 6:
+            if (!(retryAttempt <= maxRetries)) {
+              _context.next = 36;
+              break;
+            }
+            _context.prev = 7;
             setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
               loading: true
             }));
-            cellphone = phone || urlPhone;
             conditions = {
               conector: 'AND',
               conditions: [{
@@ -143,30 +158,63 @@ var PhoneAutocomplete = exports.PhoneAutocomplete = function PhoneAutocomplete(p
                 }]
               }]
             };
-            _context.prev = 3;
-            _context.next = 6;
-            return ordering.setAccessToken(token).users().select(propsToFetch).where(conditions).get();
-          case 6:
-            _yield$ordering$setAc = _context.sent;
-            result = _yield$ordering$setAc.content.result;
+            source = {};
+            reqState.users = source;
+            request = ordering.setAccessToken(token).users().select(propsToFetch).where(conditions).get({
+              cancelToken: source
+            });
+            timer = new Promise(function (resolve, reject) {
+              setTimeout(function () {
+                return reject(new Error('Timeout exceeded'));
+              }, waitTime);
+            });
+            _context.next = 16;
+            return Promise.race([request, timer]);
+          case 16:
+            response = _context.sent;
+            if (!(response.content && response.content.result)) {
+              _context.next = 23;
+              break;
+            }
+            result = response.content.result;
             setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
               users: result,
               loading: false
             }));
-            _context.next = 14;
+            return _context.abrupt("break", 36);
+          case 23:
+            throw new Error('Error');
+          case 24:
+            _context.next = 33;
             break;
-          case 11:
-            _context.prev = 11;
-            _context.t0 = _context["catch"](3);
-            setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
-              loading: false,
-              error: _context.t0.message
-            }));
-          case 14:
+          case 26:
+            _context.prev = 26;
+            _context.t0 = _context["catch"](7);
+            ((_reqState$users = reqState.users) === null || _reqState$users === void 0 ? void 0 : _reqState$users.cancel) && reqState.users.cancel();
+            if (!(retryAttempt < maxRetries)) {
+              _context.next = 32;
+              break;
+            }
+            _context.next = 32;
+            return new Promise(function (resolve) {
+              return setTimeout(resolve, waitTime);
+            });
+          case 32:
+            if (retryAttempt === maxRetries) {
+              setCustomersPhones(_objectSpread(_objectSpread({}, customersPhones), {}, {
+                loading: false,
+                error: t('ERROR_MULTIPLE_FETCH', 'Exceeded the maximum number of retries. Reload the page.')
+              }));
+            }
+          case 33:
+            retryAttempt++;
+            _context.next = 6;
+            break;
+          case 36:
           case "end":
             return _context.stop();
         }
-      }, _callee, null, [[3, 11]]);
+      }, _callee, null, [[7, 26]]);
     }));
     return function getUsers() {
       return _ref.apply(this, arguments);
@@ -351,7 +399,7 @@ var PhoneAutocomplete = exports.PhoneAutocomplete = function PhoneAutocomplete(p
   (0, _react.useEffect)(function () {
     var _customersPhones$user;
     if (urlPhone) return;
-    if (phone && phone.length >= 7 && ((customersPhones === null || customersPhones === void 0 || (_customersPhones$user = customersPhones.users) === null || _customersPhones$user === void 0 ? void 0 : _customersPhones$user.length) === 0 || phone.length === 7)) {
+    if (phone && phone.length >= 7 && ((customersPhones === null || customersPhones === void 0 || (_customersPhones$user = customersPhones.users) === null || _customersPhones$user === void 0 ? void 0 : _customersPhones$user.length) === 0 || phone.length === 7) && !customersPhones.loading) {
       getUsers();
     }
     if (phone && phone.length < 7 || !phone) {
