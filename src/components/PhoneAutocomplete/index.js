@@ -32,7 +32,6 @@ export const PhoneAutocomplete = (props) => {
    * Get users from API
    */
   const getUsers = async () => {
-    if (customersPhones.loading) return
     const maxRetries = 3
     const waitTime = 60000
     const cellphone = phone || urlPhone
