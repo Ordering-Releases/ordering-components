@@ -871,31 +871,24 @@ var Checkout = exports.Checkout = function Checkout(props) {
               return response.json();
             case 11:
               result = _context11.sent;
-              if (!result.error) {
-                _context11.next = 16;
-                break;
+              if (result.error) {
+                setAlseaCheckpriceError(t(result === null || result === void 0 ? void 0 : result.result));
+              } else {
+                setAlseaCheckpriceError(null);
               }
-              setAlseaCheckpriceError(t(result === null || result === void 0 ? void 0 : result.result));
-              _context11.next = 19;
+              setIsLoadingCheckprice(false);
+              _context11.next = 20;
               break;
             case 16:
-              setAlseaCheckpriceError(null);
-              _context11.next = 19;
-              return refreshOrderOptions();
-            case 19:
-              setIsLoadingCheckprice(false);
-              _context11.next = 26;
-              break;
-            case 22:
-              _context11.prev = 22;
+              _context11.prev = 16;
               _context11.t0 = _context11["catch"](0);
               setAlseaCheckpriceError(_context11.t0 === null || _context11.t0 === void 0 ? void 0 : _context11.t0.message);
               setIsLoadingCheckprice(false);
-            case 26:
+            case 20:
             case "end":
               return _context11.stop();
           }
-        }, _callee11, null, [[0, 22]]);
+        }, _callee11, null, [[0, 16]]);
       }));
       return function handleAlseaCheckPrice() {
         return _ref12.apply(this, arguments);
