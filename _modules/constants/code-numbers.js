@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.CODES = void 0;
-var CODES = exports.CODES = [{
+var CODES = [{
   countryCode: 'DZ',
   phoneCode: '213',
   countryName: 'Algeria'
@@ -869,3 +869,4 @@ var CODES = exports.CODES = [{
   phoneCode: '263',
   countryName: 'Zimbabwe'
 }];
+exports.CODES = CODES;
