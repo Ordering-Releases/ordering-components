@@ -286,7 +286,9 @@ var AddressForm = exports.AddressForm = function AddressForm(props) {
             conditions = [];
             parameters = {
               location: "".concat(location === null || location === void 0 ? void 0 : location.lat, ",").concat(location === null || location === void 0 ? void 0 : location.lng),
-              type: options === null || options === void 0 ? void 0 : options.type
+              type: 2,
+              page: 1,
+              page_size: 5
             };
             if (franchiseId) {
               conditions.push({
