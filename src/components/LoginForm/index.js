@@ -70,8 +70,8 @@ export const LoginForm = (props) => {
         }
       } else if (loginTab === 'otp') {
         _credentials = {
-          [otpType]: values && (values[otpType] || credentials[otpType]),
-          one_time_password: values && (values?.code || otpState)
+          [otpType]: (values && values[otpType]) || credentials[otpType],
+          one_time_password: (values && values?.code) || otpState
         }
         if (otpType === 'cellphone') {
           _credentials = {
@@ -81,8 +81,8 @@ export const LoginForm = (props) => {
         }
       } else {
         _credentials = {
-          [loginTab]: values && (values[loginTab] || credentials[loginTab]),
-          password: values && (values?.password || credentials.password)
+          [loginTab]: (values && values[loginTab]) || credentials[loginTab],
+          password: (values && values?.password) || credentials.password
         }
       }
 
