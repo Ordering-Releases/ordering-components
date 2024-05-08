@@ -42,7 +42,9 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
     pickup: 2,
     eatin: 3,
     curbside: 4,
-    drivethru: 5
+    drivethru: 5,
+    catering_delivery: 7,
+    catering_pickup: 8
   }
 
   const [state, setState] = useState({
@@ -1264,9 +1266,11 @@ export const OrderProvider = ({ Alert, children, strategy, isAlsea, isDisableToa
     if (configTypes?.length > 0 && state.options.type && !configTypes.includes(state.options.type)) {
       const validDefaultValue = configTypes.includes(configState?.configs?.default_order_type?.type)
       updateOrderOptions(validDefaultValue ? { type: configState?.configs?.default_order_type?.type } : { type: configTypes[0] })
+      if (!session.auth) {
+        changeType(validDefaultValue ? configState?.configs?.default_order_type?.type : configTypes[0])
+      }
     }
   }, [configTypes?.length, state.options.type])
-
   /**
    * Update carts from sockets
    */
