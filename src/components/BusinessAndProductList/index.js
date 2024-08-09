@@ -657,7 +657,8 @@ export const BusinessAndProductList = (props) => {
         requestsState.product = source
         const parameters = {
           type: orderState.options?.type || 1,
-          moment: orderState.options?.moment || null
+          moment: orderState.options?.moment || null,
+          version: 'v2'
         }
 
         if (orderState.options?.moment && isValidMoment(orderState.options?.moment, 'YYYY-MM-DD HH:mm:ss')) {
@@ -786,21 +787,21 @@ export const BusinessAndProductList = (props) => {
         return {
           ...category,
           ...result
-        };
+        }
       }
       if (Array.isArray(category?.subcategories) && category.subcategories.length > 0) {
         return {
           ...category,
-          subcategories: updateCategories(category.subcategories, result),
-        };
+          subcategories: updateCategories(category.subcategories, result)
+        }
       }
-      return category;
-    });
-  };
+      return category
+    })
+  }
 
   const updateStoreProduct = async (categoryId, productId, updateParams = {}) => {
     try {
-      const { content: { result, error } } = await ordering.businesses(businessState?.business?.id).categories(categoryId).products(productId).save(updateParams);
+      const { content: { result, error } } = await ordering.businesses(businessState?.business?.id).categories(categoryId).products(productId).save(updateParams)
 
       if (!error) {
         const updatedProducts = categoryState.products.map(product => {
@@ -829,7 +830,7 @@ export const BusinessAndProductList = (props) => {
       const { content: { result, error } } = await ordering.businesses(businessState?.business?.id).categories(categoryId).save(updateParams)
 
       if (!error) {
-        const updatedCategories = updateCategories(businessState?.business.categories, result);
+        const updatedCategories = updateCategories(businessState?.business.categories, result)
         const updatedBusiness = { ...businessState?.business, categories: updatedCategories }
         setBusinessState({ ...businessState, business: updatedBusiness })
         showToast(ToastType.Success, result?.enabled
