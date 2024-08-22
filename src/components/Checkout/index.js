@@ -490,7 +490,7 @@ export const Checkout = (props) => {
             value => Promise.reject(value),
             error => Promise.resolve(error)
           )
-        })
+        }).catch((error) => Promise.resolve(error))
       )
     }
     getValidationFieldOrderTypes()
