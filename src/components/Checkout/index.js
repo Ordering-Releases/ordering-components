@@ -489,8 +489,8 @@ export const Checkout = (props) => {
           return promise.then(
             value => Promise.reject(value),
             error => Promise.resolve(error)
-          )
-        }).catch((error) => Promise.resolve(error))
+          ).catch((error) => Promise.resolve(error))
+        })
       )
     }
     getValidationFieldOrderTypes()

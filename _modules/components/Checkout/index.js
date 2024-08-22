@@ -818,9 +818,9 @@ var Checkout = exports.Checkout = function Checkout(props) {
           return Promise.reject(value);
         }, function (error) {
           return Promise.resolve(error);
+        }).catch(function (error) {
+          return Promise.resolve(error);
         });
-      }).catch(function (error) {
-        return Promise.resolve(error);
       }));
     }
     getValidationFieldOrderTypes();
