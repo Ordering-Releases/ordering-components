@@ -146,7 +146,7 @@ var MultiCheckout = exports.MultiCheckout = function MultiCheckout(props) {
     return total + (cart === null || cart === void 0 ? void 0 : cart.delivery_price_with_discount);
   }, 0));
   var handleGroupPlaceOrder = /*#__PURE__*/function () {
-    var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(confirmPayment) {
+    var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(confirmPayment) {
       var _paymethodSelected$pa, _cartGroup$result3, _result$paymethod_dat;
       var paymethodData, _paymethodSelected$pa2, payload, _paymethodSelected$pa3, _yield$placeMultiCart, error, result, _result$payment_event, _paymentEvent$data, paymentEvent, _paymentEvent$data2, _yield$confirmPayment, confirmApplePayError;
       return _regeneratorRuntime().wrap(function _callee$(_context) {
@@ -192,20 +192,21 @@ var MultiCheckout = exports.MultiCheckout = function MultiCheckout(props) {
             error = _yield$placeMultiCart.error;
             result = _yield$placeMultiCart.result;
             if (!error) {
-              _context.next = 17;
+              _context.next = 18;
               break;
             }
+            setPlacing(false);
             return _context.abrupt("return");
-          case 17:
+          case 18:
             if (!((result === null || result === void 0 || (_result$paymethod_dat = result.paymethod_data) === null || _result$paymethod_dat === void 0 ? void 0 : _result$paymethod_dat.status) === 2 && actionsBeforePlace)) {
-              _context.next = 20;
+              _context.next = 21;
               break;
             }
-            _context.next = 20;
+            _context.next = 21;
             return actionsBeforePlace(paymethodSelected, result);
-          case 20:
+          case 21:
             if (!(confirmPayment && (paymethodSelected === null || paymethodSelected === void 0 ? void 0 : paymethodSelected.gateway) === 'global_apple_pay')) {
-              _context.next = 30;
+              _context.next = 31;
               break;
             }
             paymentEvent = result === null || result === void 0 || (_result$payment_event = result.payment_events) === null || _result$payment_event === void 0 ? void 0 : _result$payment_event.find(function (event) {
@@ -213,28 +214,28 @@ var MultiCheckout = exports.MultiCheckout = function MultiCheckout(props) {
               return event === null || event === void 0 || (_event$data = event.data) === null || _event$data === void 0 || (_event$data = _event$data.extra) === null || _event$data === void 0 ? void 0 : _event$data.client_secret;
             });
             if (!(paymentEvent !== null && paymentEvent !== void 0 && (_paymentEvent$data = paymentEvent.data) !== null && _paymentEvent$data !== void 0 && (_paymentEvent$data = _paymentEvent$data.extra) !== null && _paymentEvent$data !== void 0 && _paymentEvent$data.client_secret)) {
-              _context.next = 28;
+              _context.next = 29;
               break;
             }
-            _context.next = 25;
+            _context.next = 26;
             return confirmPayment(paymentEvent === null || paymentEvent === void 0 || (_paymentEvent$data2 = paymentEvent.data) === null || _paymentEvent$data2 === void 0 || (_paymentEvent$data2 = _paymentEvent$data2.extra) === null || _paymentEvent$data2 === void 0 ? void 0 : _paymentEvent$data2.client_secret);
-          case 25:
+          case 26:
             _yield$confirmPayment = _context.sent;
             confirmApplePayError = _yield$confirmPayment.error;
             if (confirmApplePayError !== null && confirmApplePayError !== void 0 && confirmApplePayError.message || confirmApplePayError !== null && confirmApplePayError !== void 0 && confirmApplePayError.localizedMessage) {
               showToast(_ToastContext.ToastType.Error, (confirmApplePayError === null || confirmApplePayError === void 0 ? void 0 : confirmApplePayError.message) || (confirmApplePayError === null || confirmApplePayError === void 0 ? void 0 : confirmApplePayError.localizedMessage));
             }
-          case 28:
+          case 29:
             setPlacing(false);
             if (!error) {
               onPlaceOrderClick && onPlaceOrderClick(result);
             }
-          case 30:
+          case 31:
             setPlacing(false);
             if (!error) {
               onPlaceOrderClick && onPlaceOrderClick(result);
             }
-          case 32:
+          case 33:
           case "end":
             return _context.stop();
         }
@@ -250,7 +251,7 @@ var MultiCheckout = exports.MultiCheckout = function MultiCheckout(props) {
     }));
   };
   var handleSelectWallet = /*#__PURE__*/function () {
-    var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2(isChecked, wallet) {
+    var _ref2 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2(isChecked, wallet) {
       var _cartGroup$result4, _cartGroup$result5;
       var url, response, _yield$response$json, error, result, _err$message;
       return _regeneratorRuntime().wrap(function _callee2$(_context2) {
@@ -323,7 +324,7 @@ var MultiCheckout = exports.MultiCheckout = function MultiCheckout(props) {
     }));
   };
   var getDeliveryOptions = /*#__PURE__*/function () {
-    var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+    var _ref3 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
       var response, _yield$response$json2, result, error;
       return _regeneratorRuntime().wrap(function _callee3$(_context3) {
         while (1) switch (_context3.prev = _context3.next) {
@@ -385,15 +386,15 @@ var MultiCheckout = exports.MultiCheckout = function MultiCheckout(props) {
     };
   }();
   var multiHandleChangeDeliveryOption = /*#__PURE__*/function () {
-    var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5(value, cartUuidArr) {
+    var _ref4 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5(value, cartUuidArr) {
       var allPromise;
       return _regeneratorRuntime().wrap(function _callee5$(_context5) {
         while (1) switch (_context5.prev = _context5.next) {
           case 0:
             _context5.prev = 0;
             allPromise = cartUuidArr.map(function (cartId) {
-              return new Promise( /*#__PURE__*/function () {
-                var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4(resolve, reject) {
+              return new Promise(/*#__PURE__*/function () {
+                var _ref5 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4(resolve, reject) {
                   var body, response, _yield$response$json3, result, error;
                   return _regeneratorRuntime().wrap(function _callee4$(_context4) {
                     while (1) switch (_context4.prev = _context4.next) {
@@ -464,7 +465,7 @@ var MultiCheckout = exports.MultiCheckout = function MultiCheckout(props) {
     };
   }();
   var handleChangeDeliveryOption = /*#__PURE__*/function () {
-    var _ref6 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee6(value) {
+    var _ref6 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6(value) {
       var cartUuidArr;
       return _regeneratorRuntime().wrap(function _callee6$(_context6) {
         while (1) switch (_context6.prev = _context6.next) {
@@ -484,7 +485,7 @@ var MultiCheckout = exports.MultiCheckout = function MultiCheckout(props) {
     };
   }();
   var getMultiCart = /*#__PURE__*/function () {
-    var _ref7 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+    var _ref7 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
       var response, _yield$response$json4, result, error;
       return _regeneratorRuntime().wrap(function _callee7$(_context7) {
         while (1) switch (_context7.prev = _context7.next) {
@@ -542,7 +543,7 @@ var MultiCheckout = exports.MultiCheckout = function MultiCheckout(props) {
     };
   }();
   var getLoyaltyPlans = /*#__PURE__*/function () {
-    var _ref8 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+    var _ref8 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
       var _result$find$accumula, _result$find, req, _yield$req$json, error, result;
       return _regeneratorRuntime().wrap(function _callee8$(_context8) {
         while (1) switch (_context8.prev = _context8.next) {
@@ -593,7 +594,7 @@ var MultiCheckout = exports.MultiCheckout = function MultiCheckout(props) {
     };
   }();
   var getValidationFieldOrderTypes = /*#__PURE__*/function () {
-    var _ref9 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+    var _ref9 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
       var requestOptions, response, content;
       return _regeneratorRuntime().wrap(function _callee9$(_context9) {
         while (1) switch (_context9.prev = _context9.next) {
